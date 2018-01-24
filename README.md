@@ -5,15 +5,9 @@ activated cooling and heating technologies.
 
 # Getting started
 
-* Please switch to the new repository [sorpsim-opt](https://github.com/nfette/sorpsim-opt).
-  Explanation below.
 * To download installer see the Releases link on Github
 * Developers: [documentation](http://www.public.asu.edu/~nfette/SorpSim/latest/)
-
-Note from nfette: After the release of v1.1, I am planning to discontinue 
-pushing to this particular repository in order to remove some large binary
-files, but may continue working in a new repository.
-
+* [LICENSE.md]
 
 # Installing and Running
 
@@ -80,3 +74,4 @@ Refer to advice in the Qwt install directions.
 # Contributing
 
 Please get in touch with the other authors and see if there are things to do.
+

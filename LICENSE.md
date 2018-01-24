@@ -1,6 +1,9 @@
-Sorption system Simulation program (SorpSim), Version 1.0
+Sorption system Simulation program (SorpSim), Version 1.1
+
 Copyright 2015, UT-Battelle, LLC
+
 Copyright 2017-2018, Nicholas Fette
+
 All rights reserved
 
 
@@ -56,4 +59,4 @@ Gershon Grossman of the Technion -- Israel Institute of Technology, for the Oak
 Ridge National Laboratory under funding of the U.S. Department of Energy
 Building Equipment Technology Program.
 
-SorpSim is developed using open source Qt under LGPL license.
+SorpSim is developed using open source Qt under LGPL license and Qwt.
