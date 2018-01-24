@@ -7,7 +7,7 @@ activated cooling and heating technologies.
 
 * To download installer see the Releases link on Github
 * Developers: [documentation](http://www.public.asu.edu/~nfette/SorpSim/latest/)
-* [LICENSE.md]
+* [LICENSE](LICENSE.md)
 
 # Installing and Running
 
