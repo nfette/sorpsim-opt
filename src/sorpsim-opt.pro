@@ -8,16 +8,19 @@ QT       += core gui
 QT       += xml
 QT       += printsupport
 
-CONFIG   += qwt console
+CONFIG   += qwt
+win32:CONFIG += console
 
 # Uncomment if you want to set this in here, otherwise set an environment variable
-#QWTPATH=C:\qwt-6.1.0
-INCLUDEPATH += $$(QWTPATH)/src
-DEPENDPATH += $$(QWTPATH)/src
+#QWTPATH=/usr/local/qwt-6.1.3
+win32:INCLUDEPATH += $$(QWTPATH)/src
+win32:DEPENDPATH += $$(QWTPATH)/src
+unix:INCLUDEPATH += $$(QWTPATH)/include
+unix:DEPENDPATH += $$(QWTPATH)/include
 
 win32:CONFIG(release, debug|release): LIBS += -L$$(QWTPATH)/lib/ -lqwt
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$(QWTPATH)/lib/ -lqwtd
-else:unix: LIBS += -L$$(QWTPATH)/lib/ -lqwt
+else:unix: LIBS += -L$$(QWTPATH)/lib -lqwt
 
 #include(c:/qwt-6.1.0/qwt.prf)
 #####include the qwt library for Mac compilation
@@ -26,8 +29,8 @@ else:unix: LIBS += -L$$(QWTPATH)/lib/ -lqwt
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 # Usage: make
-# Then you get SorpSim.exe
-TARGET = SorpSim
+# Then you get sorpsim-opt[.exe]
+TARGET = sorpsim-opt
 TEMPLATE = app
 
 #----------------------------------------------
@@ -56,8 +59,9 @@ defineReplace(copySafe){
 # This copies the extra resource files (eg *.xml) to the build directory
 # but does not really install the program anywhere.
 # There is probably another way, to avoid the confusion.
-CONFIG(debug, debug|release) {TARGET_PATH = $$OUT_PWD/debug}
-CONFIG(release, debug|release) {TARGET_PATH = $$OUT_PWD/release}
+TARGET_PATH = $$OUT_PWD
+win32:CONFIG(debug, debug|release) {TARGET_PATH = $$OUT_PWD/debug}
+win32:CONFIG(release, debug|release) {TARGET_PATH = $$OUT_PWD/release}
 mythinga.path = $$TARGET_PATH/platforms
 mythinga.files = platforms/*
 mythingb.path = $$TARGET_PATH/templates
