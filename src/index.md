@@ -20,4 +20,5 @@ Good luck!
 Getting started
 ---
 If you got lost here but wanted to download and use the program,
-please visit the repository on [Github](https://github.com/nfette/SorpSim).
+please visit the repository on [Github](https://github.com/nfette/sorpsim-opt).
+
