@@ -475,7 +475,7 @@ bool tableSelectParaDialog::tableNameUsed(QString name)//true means there has be
             auto tablesByTitle = Sorputils::mapElementsByAttribute(tableData.childNodes(), "title");
             //if(!tableData.elementsByTagName(tableName).isEmpty())
             file.close();
-            return tablesByTitle.contains(tableName);
+            return tablesByTitle.contains(name);
         }
     }
 }
