@@ -18,6 +18,7 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QDomImplementation>
+#include <QDebug>
 
 /// start a new mainwindow and leave all interactions to the mainwindow
 /// - once the mainwindow is closed, the application is closed as well
@@ -26,6 +27,17 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     QDomImplementation::setInvalidDataPolicy(QDomImplementation::ReturnNullNode);
+
+    QDir dir = qApp->applicationDirPath();
+    qDebug() << "applicationDirPath() =" << dir;
+    qDebug() << "absolutePath() =" << dir.absolutePath();
+    qDebug() << "canonicalPath =" << dir.canonicalPath();
+
+    QDir dir2;
+    qDebug() << "Default dir =" << dir2;
+    qDebug() << "absolutePath =" << dir2.absolutePath();
+    qDebug() << "canonicalPath =" << dir2.canonicalPath();
+
     MainWindow w;
     w.show();
     return a.exec();
