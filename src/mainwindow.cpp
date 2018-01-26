@@ -1011,6 +1011,8 @@ int MainWindow::askToSave()
     else return 2;
 }
 
+
+/// \todo avoid deleting the file temp.xml if it is the current case name
 bool MainWindow::loadCase(QString name)
 {
 
@@ -1389,13 +1391,21 @@ bool MainWindow::loadCase(QString name)
 
             setTPMenu();
 
-
 #ifdef Q_OS_UNIX
+            // TODO: guard against destruction
             saveRecentFile(globalpara.caseName);
             setRecentFiles();
             QFile file("temp.xml");
             if(file.exists())
-                file.remove();
+            {
+                // TODO: close ofile first
+                // On windows, this prevents remove()
+                // On linux, remove() succeesd
+                if (file.remove())
+                    qDebug() << "remove temp.xml: ok";
+                else
+                    qDebug() << "remove temp.xml: fail";
+            }
 #endif
 #ifdef Q_OS_MAC
             QDir dir = qApp->applicationDirPath();
