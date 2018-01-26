@@ -59,6 +59,10 @@ defineReplace(copySafe){
 # This copies the extra resource files (eg *.xml) to the build directory
 # but does not really install the program anywhere.
 # There is probably another way, to avoid the confusion.
+
+# Note regarding target path: folder structures are different on windows by default
+# See https://bugreports.qt.io/browse/QTBUG-52347
+# CONFIG -= debug_and_release
 TARGET_PATH = $$OUT_PWD
 win32:CONFIG(debug, debug|release) {TARGET_PATH = $$OUT_PWD/debug}
 win32:CONFIG(release, debug|release) {TARGET_PATH = $$OUT_PWD/release}
