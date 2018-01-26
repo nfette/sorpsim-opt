@@ -129,7 +129,7 @@ bool startDialog::event(QEvent *e)
 
 bool startDialog::loadRecentFiles()
 {
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QString fileName(QDir(qApp->applicationDirPath()).absolutePath()+"/platforms/systemSetting.xml");
 #endif
 #ifdef Q_OS_MAC

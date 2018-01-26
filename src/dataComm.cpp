@@ -399,7 +399,7 @@ bool globalparameter::findNextPtxPoint(Node *thisNode, Node *StartingNode)
 
 void globalparameter::removeRecentFile(QString delFileName)
 {
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QString fileName(QDir(qApp->applicationDirPath()).absolutePath()+"/platforms/systemSetting.xml");
 #endif
 

@@ -143,7 +143,7 @@ bool tableDialog::setupTables(bool init)
     ui->tabWidget->clear();
 
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QFile ofile,file;
     if(init)
     {
@@ -441,7 +441,7 @@ QString tableDialog::translateOutput(QStringList outputEntries, int index, int i
 bool tableDialog::reshapeXml(int adrPosition, int adrIar)
 {
     QTableWidget * tableToUpdate = dynamic_cast<QTableWidget *>(ui->tabWidget->currentWidget());
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QFile file("tableTemp.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -581,7 +581,7 @@ void tableDialog::copyTable()
 
     QString tName = ui->tabWidget->tabText(ui->tabWidget->currentIndex());
     QString newName = tName+"Copy";
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QFile file("tableTemp.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -639,7 +639,7 @@ void tableDialog::copyTable()
 bool tableDialog::updateXml()
 {
     QTableWidget * tableToUpdate = dynamic_cast<QTableWidget *>(ui->tabWidget->currentWidget());
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QFile file("tableTemp.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -927,7 +927,7 @@ bool tableDialog::calc(globalparameter globalpara, QString fileName, int run)
 
 void tableDialog::calcTable()
 {
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QFile file("tableTemp.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -1490,7 +1490,7 @@ void tableDialog::on_alterVarButton_clicked()
 {
     QTableWidget * currentTable = dynamic_cast<QTableWidget *>(ui->tabWidget->currentWidget());
     alvRowCount = currentTable->rowCount();
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QFile file("tableTemp.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -1655,7 +1655,7 @@ void tableDialog::on_deleteTButton_clicked()
     if(askBox->buttonRole(askBox->clickedButton())==QMessageBox::YesRole)
     {
         QTableWidget * tableToDelete = dynamic_cast<QTableWidget *>(ui->tabWidget->currentWidget());
-    #ifdef Q_OS_WIN32
+    #ifdef Q_OS_UNIX
         QFile file("tableTemp.xml");
     #endif
     #ifdef Q_OS_MAC
@@ -2058,7 +2058,7 @@ void tableDialog::closeEvent(QCloseEvent *)
 bool tableDialog::saveChanges()
 {
     bool openOK = true;
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QFile ofile(globalpara.caseName),file("tableTemp.xml");
 #endif
 #ifdef Q_OS_MAC

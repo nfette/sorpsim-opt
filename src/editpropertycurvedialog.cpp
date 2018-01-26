@@ -106,7 +106,7 @@ editPropertyCurveDialog::editPropertyCurveDialog(Plot*d_plot, QList<QwtPlotCurve
 
     ui->seleCycleButton->hide();
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QFile file("plotTemp.xml");
     setWindowModality(Qt::NonModal);
 #endif
@@ -640,7 +640,7 @@ void editPropertyCurveDialog::on_okButton_clicked()
 
 void editPropertyCurveDialog::updateXml()
 {
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QFile file("plotTemp.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -750,7 +750,7 @@ void editPropertyCurveDialog::updateXml()
 void editPropertyCurveDialog::removeOld()
 {
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
             QFile file("plotTemp.xml");
         #endif
         #ifdef Q_OS_MAC

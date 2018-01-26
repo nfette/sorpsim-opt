@@ -557,7 +557,7 @@ void curvesetting::on_deleteCurveButton_clicked()
 
     QString plotTitle = set_plot->title().text();
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QFile file("plotTemp.xml");
 #endif
 #ifdef Q_OS_MAC

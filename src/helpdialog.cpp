@@ -51,7 +51,7 @@ void helpDialog::on_itemList_itemActivated(QTreeWidgetItem *item, int column)
     QString itemName = item->text(0);
     itemName.replace(" ","_");
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QString fileName(QDir(qApp->applicationDirPath()).absolutePath()+"/platforms/systemSetting.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -103,7 +103,7 @@ bool helpDialog::loadList()
 {
     list->clear();
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QString fileName(QDir(qApp->applicationDirPath()).absolutePath()+"/platforms/systemSetting.xml");
 #endif
 #ifdef Q_OS_MAC

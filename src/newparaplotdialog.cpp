@@ -187,7 +187,7 @@ bool newParaPlotDialog::setupXml()
     if(mode==2)//from plot re-select
     {
         QFile oFile(globalpara.caseName);
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
         oFile.copy("plotTemp.xml");
         file.setFileName("plotTemp.xml");
 #endif
@@ -372,7 +372,7 @@ bool newParaPlotDialog::plotNameUsed(QString name)
 //    else if(mode==1)
 //        file.setFileName("tableTemp.xml");
     else /*if(mode==2)*/
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
         file.setFileName("plotTemp.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -496,7 +496,7 @@ bool newParaPlotDialog::readTheFile(QString tableName)
 //    else if(mode==1)
 //        file.setFileName("tableTemp.xml");
     else if(mode==2)
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
         file.setFileName("plotTemp.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -631,7 +631,7 @@ bool newParaPlotDialog::setTable()
 //    if(mode==1)
 //        file.setFileName("tableTemp.xml");
     else if(mode ==2)
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
         file.setFileName("plotTemp.xml");
 #endif
 #ifdef Q_OS_MAC

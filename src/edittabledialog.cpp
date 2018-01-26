@@ -279,7 +279,7 @@ void editTableDialog::on_cancelButton_clicked()
 
 bool editTableDialog::setupXml()
 {
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QFile file("tableTemp.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -444,7 +444,7 @@ bool editTableDialog::setupXml()
 bool editTableDialog::loadTheTable()
 {
     oldTableName = tableName;
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QFile file("tableTemp.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -662,7 +662,7 @@ bool editTableDialog::tableNameUsed(QString name)
     {
         if(tableName.count() == 0)
             return true;
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
         QFile file("tableTemp.xml");
 #endif
 #ifdef Q_OS_MAC

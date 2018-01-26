@@ -205,7 +205,7 @@ bool plotsDialog::loadXml(bool init)
 
     tabs->clear();
     QFile file;
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     if(init)
     {
         QFile ofile(globalpara.caseName);
@@ -627,7 +627,7 @@ void plotsDialog::deleteCurrentPlot()
         Plot* plotToDelete = dynamic_cast<Plot*>(tabs->currentWidget());
         //QString plotTitle = tabs->tabText(tabs->currentIndex());
         QString plotTitle = plotToDelete->title().text();
-    #ifdef Q_OS_WIN32
+    #ifdef Q_OS_UNIX
         QFile file("plotTemp.xml");
     #endif
     #ifdef Q_OS_MAC
@@ -759,7 +759,7 @@ void plotsDialog::on_dataSelectButton_clicked()
     bool noTable = false;
 
     //make name-space for the new plot
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QFile file("plotTemp.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -826,7 +826,7 @@ void plotsDialog::on_dataSelectButton_clicked()
         if(pDialog->exec()==QDialog::Accepted)
         {
             //if accepted, delete the original node under name _mod
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
             QFile file("plotTemp.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -866,7 +866,7 @@ void plotsDialog::on_dataSelectButton_clicked()
         else
         {
             //if canceled, resume the original plot name
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
             QFile file("plotTemp.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -914,7 +914,7 @@ void plotsDialog::on_copyButton_clicked()
 {
     QString pName = tabs->tabText(tabs->currentIndex());
     QString newName = pName+"Copy";
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QFile file("plotTemp.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -970,7 +970,7 @@ void plotsDialog::closeEvent(QCloseEvent *)
     saveChanges();
     theScene->plotWindow = NULL;
     theMainwindow->setTPMenu();
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QFile file("plotTemp.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -987,7 +987,7 @@ void plotsDialog::closeEvent(QCloseEvent *)
 
 bool plotsDialog::saveChanges()
 {
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QFile ofile(globalpara.caseName),file("plotTemp.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -1057,7 +1057,7 @@ void plotsDialog::savePlotSettings()
     qDebug() << "Note: QDomImplementation::invalidDataPolicy() is " << policy;
 #endif
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QFile file("plotTemp.xml");
 #endif
 #ifdef Q_OS_MAC

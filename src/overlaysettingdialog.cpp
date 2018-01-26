@@ -112,7 +112,7 @@ overlaysetting::overlaysetting(Plot *d_plot,QWidget *parent):
     connect(ui->radioButton,SIGNAL(toggled(bool)),ui->groupBox,SLOT(setVisible(bool)));
 
     QString fName;
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     fName = "plotTemp.xml";
 #endif
 #ifdef Q_OS_MAC
@@ -284,7 +284,7 @@ void overlaysetting::on_buttonBox_accepted()
 
 void overlaysetting::updateXml()
 {
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QFile file("plotTemp.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -399,7 +399,7 @@ bool overlaysetting::curveNameUsed(QString name)
     if(name.count()==0)
         return true;
     QFile file;
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     file.setFileName("plotTemp.xml");
 #endif
 #ifdef Q_OS_MAC

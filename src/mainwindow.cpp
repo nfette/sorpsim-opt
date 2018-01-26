@@ -758,7 +758,7 @@ void MainWindow::startWindow()
         if(type=="template")
         {
             QString tempFileName;
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
             if(fileName=="Single-effect LiBr-water chiller")
                 tempFileName = QDir(qApp->applicationDirPath()).absolutePath()+"/templates/SEC.xml";
             else if(fileName=="Double-effect LiBr-water chiller")
@@ -856,7 +856,7 @@ void MainWindow::newCase()
 {
     bool goBack = false;
     //create a "temp" file
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     globalpara.caseName = "temp.xml";
     setWindowTitle("SorpSim-new case");
     QFile clearFile("temp.xml");
@@ -1390,7 +1390,7 @@ bool MainWindow::loadCase(QString name)
             setTPMenu();
 
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
             saveRecentFile(globalpara.caseName);
             setRecentFiles();
             QFile file("temp.xml");
@@ -2024,7 +2024,7 @@ bool MainWindow::loadOutFile()
             }
 
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
             globalpara.caseName = "temp.xml";
 #endif
 #ifdef Q_OS_MAC
@@ -2255,7 +2255,7 @@ bool MainWindow::noChangeMade()
     // TODO: implement comparison or operator==() for objects being compared
     bool nChanged = true;
     QFile ofile(globalpara.caseName);
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     if(globalpara.caseName=="temp.xml")
         return false;
 #endif
@@ -2803,7 +2803,7 @@ bool MainWindow::setTPMenu()
  */
 bool MainWindow::setRecentFiles()
 {
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     QString fileName(QDir(qApp->applicationDirPath()).absolutePath()+"/platforms/systemSetting.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -2855,7 +2855,7 @@ bool MainWindow::setRecentFiles()
 bool MainWindow::saveRecentFile(QString fileDir)
 {
     QString fName;
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     fName = "temp.xml";
 #endif
 #ifdef Q_OS_MAC
@@ -2868,7 +2868,7 @@ bool MainWindow::saveRecentFile(QString fileDir)
 #endif
     if(fileDir!=fName)
     {
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
         QString ofileName(QDir(qApp->applicationDirPath()).absolutePath()+"/platforms/systemSetting.xml");
 #endif
 #ifdef Q_OS_MAC
@@ -2996,7 +2996,7 @@ void MainWindow::openRecentFile()
                 //save current file
                 saveFile(globalpara.caseName,false);
                 QString fName;
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
                 fName = "temp.xml";
 #endif
 #ifdef Q_OS_MAC
@@ -3159,7 +3159,7 @@ void MainWindow::on_actionSave_triggered()
 {
     saveFile(globalpara.caseName,false);
     QString fName;
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     fName = "temp.xml";
 #endif
 #ifdef Q_OS_MAC
@@ -3206,7 +3206,7 @@ void MainWindow::on_actionOpen_triggered()
         //save current file
         saveFile(globalpara.caseName,false);
         QString fName;
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
         fName = "temp.xml";
 #endif
 #ifdef Q_OS_MAC
@@ -3532,7 +3532,7 @@ void MainWindow::on_actionSave_As_triggered()
     if(name!="")
     {
         QString fName;
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
         fName = "temp.xml";
 #endif
 #ifdef Q_OS_MAC
@@ -4133,7 +4133,7 @@ void MainWindow::on_actionImport_out_File_triggered()//this function needs to be
         //save current file
         saveFile(globalpara.caseName,false);
         QString fName;
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
         fName = "temp.xml";
 #endif
 #ifdef Q_OS_MAC
@@ -4200,7 +4200,7 @@ void MainWindow::on_actionSystem_Settings_triggered()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     QString fName;
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
     fName = "temp.xml";
 #endif
 #ifdef Q_OS_MAC
@@ -4483,7 +4483,7 @@ void MainWindow::loadExampleCase()
         QAction*theAction = dynamic_cast<QAction*>(sender());
         fileName = theAction->text();
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
             if(fileName=="Single-effect LiBr-water chiller")
                 tempFileName = QDir(qApp->applicationDirPath()).absolutePath()+"/templates/SEC.xml";
             else if(fileName=="Double-effect LiBr-water chiller")
@@ -4527,7 +4527,7 @@ void MainWindow::loadExampleCase()
         }
         else
         {
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_UNIX
             int askSave = askToSave();
             switch(askSave)
             {
