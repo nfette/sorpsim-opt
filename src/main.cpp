@@ -16,6 +16,7 @@
 
 
 #include "mainwindow.h"
+#include "sorputils.h"
 #include <QApplication>
 #include <QDomImplementation>
 #include <QDebug>
@@ -37,6 +38,8 @@ int main(int argc, char *argv[])
     qDebug() << "Default dir =" << dir2;
     qDebug() << "absolutePath =" << dir2.absolutePath();
     qDebug() << "canonicalPath =" << dir2.canonicalPath();
+
+    Sorputils::init();
 
     MainWindow w;
     w.show();

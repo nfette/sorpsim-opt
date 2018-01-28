@@ -324,6 +324,7 @@ private:
     /**
      * @brief SSGetTempFileName
      * @return A QTemporaryFile that will be automatically removed when this is destroyed.
+     * @todo deprecate and remove - see Sorputils::sorpTempDir().
      */
     QFile * SSGetTempFileName();
 
