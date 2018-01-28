@@ -142,46 +142,19 @@ bool tableDialog::setupTables(bool init)
 
     ui->tabWidget->clear();
 
-
-#ifdef Q_OS_UNIX
-    QFile ofile,file;
+    QString tableTempXML = Sorputils::sorpTempDir().absoluteFilePath("tableTemp.xml");
+    QFile file(tableTempXML);
     if(init)
     {
-        ofile.setFileName(globalpara.caseName);
-        file.setFileName("tableTemp.xml");
+        QFile ofile(globalpara.caseName);
         if(file.exists())
             file.remove();
-        if(!ofile.copy("tableTemp.xml"))
+        if(!ofile.copy(tableTempXML))
         {
             globalpara.reportError("Fail to generate temporary file for tables.",this);
             return false;
         }
-        else file.setFileName("tableTemp.xml");
     }
-    else file.setFileName("tableTemp.xml");
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    QFile ofile,file;
-    if(init)
-    {
-        ofile.setFileName(globalpara.caseName);
-        file.setFileName(bundleDir+"/tableTemp.xml");
-        if(file.exists())
-            file.remove();
-        if(!ofile.copy(bundleDir+"/tableTemp.xml"))
-        {
-            globalpara.reportError("Fail to generate temporary file for tables.",this);
-            return false;
-        }
-        else file.setFileName(bundleDir+"/tableTemp.xml");
-    }
-    else file.setFileName(bundleDir+"/tableTemp.xml");
-#endif
 
     if(file.exists())//check if the file already exists
     {
@@ -441,17 +414,10 @@ QString tableDialog::translateOutput(QStringList outputEntries, int index, int i
 bool tableDialog::reshapeXml(int adrPosition, int adrIar)
 {
     QTableWidget * tableToUpdate = dynamic_cast<QTableWidget *>(ui->tabWidget->currentWidget());
-#ifdef Q_OS_UNIX
-    QFile file("tableTemp.xml");
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    QFile file(bundleDir+"/tableTemp.xml");
-#endif
+
+    QString tableTempXML = Sorputils::sorpTempDir().absoluteFilePath("tableTemp.xml");
+    QFile file(tableTempXML);
+
     QTextStream stream;
     stream.setDevice(&file);
     if(!file.open(QIODevice::ReadWrite|QIODevice::Text))
@@ -581,17 +547,10 @@ void tableDialog::copyTable()
 
     QString tName = ui->tabWidget->tabText(ui->tabWidget->currentIndex());
     QString newName = tName+"Copy";
-#ifdef Q_OS_UNIX
-    QFile file("tableTemp.xml");
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    QFile file(bundleDir+"/tableTemp.xml");
-#endif
+
+    QString tableTempXML = Sorputils::sorpTempDir().absoluteFilePath("tableTemp.xml");
+    QFile file(tableTempXML);
+
     QTextStream stream;
     stream.setDevice(&file);
     if(!file.open(QIODevice::ReadWrite|QIODevice::Text))
@@ -639,17 +598,9 @@ void tableDialog::copyTable()
 bool tableDialog::updateXml()
 {
     QTableWidget * tableToUpdate = dynamic_cast<QTableWidget *>(ui->tabWidget->currentWidget());
-#ifdef Q_OS_UNIX
-    QFile file("tableTemp.xml");
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    QFile file(bundleDir+"/tableTemp.xml");
-#endif
+
+    QString tableTempXML = Sorputils::sorpTempDir().absoluteFilePath("tableTemp.xml");
+    QFile file(tableTempXML);
 
     if(!file.open(QIODevice::ReadWrite|QIODevice::Text))
     {
@@ -927,17 +878,9 @@ bool tableDialog::calc(globalparameter globalpara, QString fileName, int run)
 
 void tableDialog::calcTable()
 {
-#ifdef Q_OS_UNIX
-    QFile file("tableTemp.xml");
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    QFile file(bundleDir+"/tableTemp.xml");
-#endif
+    QString tableTempXML = Sorputils::sorpTempDir().absoluteFilePath("tableTemp.xml");
+    QFile file(tableTempXML);
+
     QTableWidget * tableToCalculate = dynamic_cast<QTableWidget *>(ui->tabWidget->currentWidget());
     QDomDocument doc;
     QTextStream stream;
@@ -1490,17 +1433,10 @@ void tableDialog::on_alterVarButton_clicked()
 {
     QTableWidget * currentTable = dynamic_cast<QTableWidget *>(ui->tabWidget->currentWidget());
     alvRowCount = currentTable->rowCount();
-#ifdef Q_OS_UNIX
-    QFile file("tableTemp.xml");
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    QFile file(bundleDir+"/tableTemp.xml");
-#endif
+
+    QString tableTempXML = Sorputils::sorpTempDir().absoluteFilePath("tableTemp.xml");
+    QFile file(tableTempXML);
+
     QDomDocument doc;
     altervDialog alvDialog(this);
     alvDialog.setTableName(ui->tabWidget->tabText(ui->tabWidget->currentIndex()));
@@ -1655,17 +1591,9 @@ void tableDialog::on_deleteTButton_clicked()
     if(askBox->buttonRole(askBox->clickedButton())==QMessageBox::YesRole)
     {
         QTableWidget * tableToDelete = dynamic_cast<QTableWidget *>(ui->tabWidget->currentWidget());
-    #ifdef Q_OS_UNIX
-        QFile file("tableTemp.xml");
-    #endif
-    #ifdef Q_OS_MAC
-        QDir dir = qApp->applicationDirPath();
-        /*dir.cdUp();*/
-        /*dir.cdUp();*/
-        /*dir.cdUp();*/
-        QString bundleDir(dir.absolutePath());
-        QFile file(bundleDir+"/tableTemp.xml");
-    #endif
+
+        QString tableTempXML = Sorputils::sorpTempDir().absoluteFilePath("tableTemp.xml");
+        QFile file(tableTempXML);
         if(!file.open(QIODevice::ReadWrite|QIODevice::Text))
         {
             return;
@@ -2058,17 +1986,9 @@ void tableDialog::closeEvent(QCloseEvent *)
 bool tableDialog::saveChanges()
 {
     bool openOK = true;
-#ifdef Q_OS_UNIX
-    QFile ofile(globalpara.caseName),file("tableTemp.xml");
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    QFile ofile(globalpara.caseName),file(bundleDir+"/tableTemp.xml");
-#endif
+    QString tableTempXML = Sorputils::sorpTempDir().absoluteFilePath("tableTemp.xml");
+    QFile ofile(globalpara.caseName),
+            file(tableTempXML);
 
     QDomDocument odoc,doc;
     QDomElement oroot;

@@ -98,6 +98,7 @@
 #include "newpropplotdialog.h"
 #include "calcdetaildialog.h"
 #include "guessdialog.h"
+#include "sorputils.h"
 
 
 /*! \name Units and links
@@ -758,81 +759,39 @@ void MainWindow::startWindow()
         if(type=="template")
         {
             QString tempFileName;
-#ifdef Q_OS_UNIX
-            if(fileName=="Single-effect LiBr-water chiller")
-                tempFileName = QDir(qApp->applicationDirPath()).absolutePath()+"/templates/SEC.xml";
-            else if(fileName=="Double-effect LiBr-water chiller")
-                tempFileName = QDir(qApp->applicationDirPath()).absolutePath()+"/templates/DECP.xml";
-            else if(fileName=="Double-condenser-coupled, triple-effect LiBr-water chiller")
-                tempFileName = QDir(qApp->applicationDirPath()).absolutePath()+"/templates/DCCAP.xml";
-            else if(fileName=="Generator-absorber heat exchanger, water-ammonia heat pump")
-                tempFileName = QDir(qApp->applicationDirPath()).absolutePath()+"/templates/GAX.xml";
-            else if(fileName=="Adiabatic liquid desiccant cycle")
-                tempFileName = QDir(qApp->applicationDirPath()).absolutePath()+"/templates/LDAC.xml";
-            else if(fileName=="Internally cooled/heated liquid desiccant cycle")
-                tempFileName = QDir(qApp->applicationDirPath()).absolutePath()+"/templates/LDAC2.xml";
-
-            QFile newFile("temp.xml");
-            if(newFile.exists())
-                newFile.remove();
-            QFile tpFile;
-            tpFile.setFileName(tempFileName);
-            if(tpFile.copy("temp.xml"))
-            {
-                if(!loadCase("temp.xml"))
-                    startWindow();
-            }
-            else
-            {
-                globalpara.reportError("Failed to find/open");
-                startWindow();
-            }
-#endif
-#ifdef Q_OS_MAC
-            QDir dir = qApp->applicationDirPath();
-            /*dir.cdUp();*/
-            /*dir.cdUp();*/
-            /*dir.cdUp();*/
-            QString bundleDir(dir.absolutePath());
 
             if(fileName=="Single-effect LiBr-water chiller")
-                tempFileName = dir.absolutePath()+"/templates/SEC.xml";
+                tempFileName = ":/examples/templates/SEC.xml";
             else if(fileName=="Double-effect LiBr-water chiller")
-                tempFileName = dir.absolutePath()+"/templates/DECP.xml";
+                tempFileName = ":/examples/templates/DECP.xml";
             else if(fileName=="Double-condenser-coupled, triple-effect LiBr-water chiller")
-                tempFileName = dir.absolutePath()+"/templates/DCCAP.xml";
+                tempFileName = ":/examples/templates/DCCAP.xml";
             else if(fileName=="Generator-absorber heat exchanger, water-ammonia heat pump")
-                tempFileName = dir.absolutePath()+"/templates/GAX.xml";
+                tempFileName = ":/examples/templates/GAX.xml";
             else if(fileName=="Adiabatic liquid desiccant cycle")
-                tempFileName = dir.absolutePath()+"/templates/LDAC.xml";
+                tempFileName = ":/examples/templates/LDAC.xml";
             else if(fileName=="Internally cooled/heated liquid desiccant cycle")
-                tempFileName = dir.absolutePath()+"/templates/LDAC2.xml";
+                tempFileName = ":/examples/templates/LDAC2.xml";
 
-
-
-            QFile newFile;
-            newFile.setFileName(bundleDir+"/temp.xml");
+            QString tempXML = Sorputils::sorpTempDir().absoluteFilePath("temp.xml");
+            QFile newFile(tempXML);
             if(newFile.exists())
             {
                 newFile.remove();
                 globalpara.reportError("new file exist and removed");
             }
-            QFile tpFile;
-            tpFile.setFileName(tempFileName);
-
-
-            if(tpFile.copy(bundleDir+"/temp.xml"))
+            QFile tpFile(tempFileName);
+            if(tpFile.copy(tempXML))
             {
-                if(!loadCase(bundleDir+"/temp.xml"))
+                newFile.setPermissions(newFile.permissions() | QFileDevice::WriteGroup);
+                if(!loadCase(tempXML))
                     startWindow();
             }
             else
             {
-                globalpara.reportError("Failed to find/open:\n"+tpFile.errorString());
+                globalpara.reportError("Failed to find/open:\n" + tpFile.errorString());
                 startWindow();
             }
-#endif
-
         }
         else if(type=="recent")
         {
@@ -856,29 +815,16 @@ void MainWindow::newCase()
 {
     bool goBack = false;
     //create a "temp" file
-#ifdef Q_OS_UNIX
-    globalpara.caseName = "temp.xml";
+    QString tempXML = Sorputils::sorpTempDir().absoluteFilePath("temp.xml");
+    globalpara.caseName = tempXML;
     setWindowTitle("SorpSim-new case");
-    QFile clearFile("temp.xml");
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    globalpara.caseName = bundleDir+"/temp.xml";
-    setWindowTitle("SorpSim-new case");
-    QFile clearFile(bundleDir+"/temp.xml");
-#endif
+    QFile clearFile(tempXML);
     clearFile.remove();
 
     //clear the scene and global parameters
     defaultTheSystem();
 
     //clear the scene and global parameters
-
-
     unitsetting uDialog(this);
     uDialog.setWindowTitle("Unit System");
     uDialog.setModal(true);
@@ -1391,40 +1337,19 @@ bool MainWindow::loadCase(QString name)
 
             setTPMenu();
 
-#ifdef Q_OS_UNIX
-            // TODO: guard against destruction
-            saveRecentFile(globalpara.caseName);
-            setRecentFiles();
-            QFile file("temp.xml");
-            if(file.exists())
-            {
-                // TODO: close ofile first
-                // On windows, this prevents remove()
-                // On linux, remove() succeesd
-                if (file.remove())
-                    qDebug() << "remove temp.xml: ok";
-                else
-                    qDebug() << "remove temp.xml: fail";
-            }
-#endif
-#ifdef Q_OS_MAC
-            QDir dir = qApp->applicationDirPath();
-            /*dir.cdUp();*/
-            /*dir.cdUp();*/
-            /*dir.cdUp();*/
-            QString bundleDir(dir.absolutePath());
-
-            if(globalpara.caseName!=(bundleDir+"/temp.xml"))
+            QString tempXML = Sorputils::sorpTempDir().absoluteFilePath("temp.xml");
+            if (globalpara.caseName != tempXML)
             {
                 saveRecentFile(globalpara.caseName);
                 setRecentFiles();
 
-                QFile file(bundleDir+"/temp.xml");
-                if(file.exists())
-                    file.remove();
+                QFile file(tempXML);
+                if (file.remove())
+                    qDebug() << "remove temp.xml: ok";
+                else
+                    qDebug() << "remove temp.xml: fail";
 
             }
-#endif
             return true;
         }
 
@@ -2033,19 +1958,9 @@ bool MainWindow::loadOutFile()
                 }
             }
 
+            QString tempXML = Sorputils::sorpTempDir().absoluteFilePath("temp.xml");
+            globalpara.caseName = tempXML;
 
-#ifdef Q_OS_UNIX
-            globalpara.caseName = "temp.xml";
-#endif
-#ifdef Q_OS_MAC
-            QDir dir = qApp->applicationDirPath();
-            /*dir.cdUp();*/
-            /*dir.cdUp();*/
-            /*dir.cdUp();*/
-            QString bundleDir(dir.absolutePath());
-
-            globalpara.caseName = bundleDir+"/temp.xml";
-#endif
             QFont font("Helvetica",11);
             scene->copRect = scene->addRect(0,20,200,40);
             QPen pen(Qt::white);
@@ -2265,19 +2180,10 @@ bool MainWindow::noChangeMade()
     // TODO: implement comparison or operator==() for objects being compared
     bool nChanged = true;
     QFile ofile(globalpara.caseName);
-#ifdef Q_OS_UNIX
-    if(globalpara.caseName=="temp.xml")
+    QString tempXML = Sorputils::sorpTempDir().absoluteFilePath("temp.xml");
+    if(globalpara.caseName==tempXML)
         return false;
-#endif
-#ifdef Q_OS_MAC
-        QDir dir = qApp->applicationDirPath();
-        /*dir.cdUp();*/
-        /*dir.cdUp();*/
-        /*dir.cdUp();*/
-        QString bundleDir(dir.absolutePath());
-        if(globalpara.caseName==bundleDir+"/temp.xml")
-            return false;
-#endif
+
     QDomDocument doc;
     QDomElement root, caseData, globalData, unitData, spData;
     if(!ofile.open(QIODevice::ReadOnly|QIODevice::Text))
@@ -2813,14 +2719,7 @@ bool MainWindow::setTPMenu()
  */
 bool MainWindow::setRecentFiles()
 {
-#ifdef Q_OS_UNIX
-    QString fileName(QDir(qApp->applicationDirPath()).absolutePath()+"/platforms/systemSetting.xml");
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    QString fileName(dir.absolutePath()+"/templates/systemSetting.xml");
-#endif
-    QFile ofile(fileName);
+    QFile ofile(Sorputils::sorpSettings());
     QDomDocument doc;
     if(!ofile.open(QIODevice::ReadOnly|QIODevice::Text))
     {
@@ -2865,25 +2764,11 @@ bool MainWindow::setRecentFiles()
 bool MainWindow::saveRecentFile(QString fileDir)
 {
     QString fName;
-#ifdef Q_OS_UNIX
-    fName = "temp.xml";
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    fName = bundleDir+"/temp.xml";
-#endif
+    QString tempXML = Sorputils::sorpTempDir().absoluteFilePath("temp.xml");
+    fName = tempXML;
     if(fileDir!=fName)
     {
-#ifdef Q_OS_UNIX
-        QString ofileName(QDir(qApp->applicationDirPath()).absolutePath()+"/platforms/systemSetting.xml");
-#endif
-#ifdef Q_OS_MAC
-        QString ofileName(dir.absolutePath()+"/templates/systemSetting.xml");
-#endif
+        QString ofileName(Sorputils::sorpSettings());
         QFile ofile(ofileName);
         QDomDocument doc;
         QTextStream stream;
@@ -3006,17 +2891,9 @@ void MainWindow::openRecentFile()
                 //save current file
                 saveFile(globalpara.caseName,false);
                 QString fName;
-#ifdef Q_OS_UNIX
-                fName = "temp.xml";
-#endif
-#ifdef Q_OS_MAC
-                QDir dir = qApp->applicationDirPath();
-                /*dir.cdUp();*/
-                /*dir.cdUp();*/
-                /*dir.cdUp();*/
-                QString bundleDir(dir.absolutePath());
-                fName = bundleDir+"/temp.xml";
-#endif
+
+                QString tempXML = Sorputils::sorpTempDir().absoluteFilePath("temp.xml");
+                fName = tempXML;
                 if(globalpara.caseName == fName)
                 {
                     QString name = QFileDialog::getSaveFileName(this,"Save current case to file:","./","XML files(*.xml)");
@@ -3169,17 +3046,8 @@ void MainWindow::on_actionSave_triggered()
 {
     saveFile(globalpara.caseName,false);
     QString fName;
-#ifdef Q_OS_UNIX
-    fName = "temp.xml";
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    fName = bundleDir+"/temp.xml";
-#endif
+    QString tempXML = Sorputils::sorpTempDir().absoluteFilePath("temp.xml");
+    fName = tempXML;
     if(globalpara.caseName == fName)
     {
         QString name = QFileDialog::getSaveFileName(this,"Save current case to file:","./","XML files(*.xml)");
@@ -3216,17 +3084,8 @@ void MainWindow::on_actionOpen_triggered()
         //save current file
         saveFile(globalpara.caseName,false);
         QString fName;
-#ifdef Q_OS_UNIX
-        fName = "temp.xml";
-#endif
-#ifdef Q_OS_MAC
-        QDir dir = qApp->applicationDirPath();
-        /*dir.cdUp();*/
-        /*dir.cdUp();*/
-        /*dir.cdUp();*/
-        QString bundleDir(dir.absolutePath());
-        fName = bundleDir +"/temp.xml";
-#endif
+        QString tempXML = Sorputils::sorpTempDir().absoluteFilePath("temp.xml");
+        fName = tempXML;
         if(globalpara.caseName == fName)
         {
             // FIXED: Simplified flow for user's sake.
@@ -3542,17 +3401,8 @@ void MainWindow::on_actionSave_As_triggered()
     if(name!="")
     {
         QString fName;
-#ifdef Q_OS_UNIX
-        fName = "temp.xml";
-#endif
-#ifdef Q_OS_MAC
-        QDir dir = qApp->applicationDirPath();
-        /*dir.cdUp();*/
-        /*dir.cdUp();*/
-        /*dir.cdUp();*/
-        QString bundleDir(dir.absolutePath());
-        fName =  bundleDir+"/temp.xml";
-#endif
+        QString tempXML = Sorputils::sorpTempDir().absoluteFilePath("temp.xml");
+        fName = tempXML;
         if(globalpara.caseName == fName)
         {
             saveFile(globalpara.caseName,false);
@@ -4143,17 +3993,8 @@ void MainWindow::on_actionImport_out_File_triggered()//this function needs to be
         //save current file
         saveFile(globalpara.caseName,false);
         QString fName;
-#ifdef Q_OS_UNIX
-        fName = "temp.xml";
-#endif
-#ifdef Q_OS_MAC
-        QDir dir = qApp->applicationDirPath();
-        /*dir.cdUp();*/
-        /*dir.cdUp();*/
-        /*dir.cdUp();*/
-        QString bundleDir(dir.absolutePath());
-        fName = bundleDir+"/temp.xml";
-#endif
+        QString tempXML = Sorputils::sorpTempDir().absoluteFilePath("temp.xml");
+        fName = tempXML;
         if(globalpara.caseName == fName)
         {
             QString name = QFileDialog::getSaveFileName(this,"Save current case to file:","./","XML files(*.xml)");
@@ -4210,17 +4051,8 @@ void MainWindow::on_actionSystem_Settings_triggered()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     QString fName;
-#ifdef Q_OS_UNIX
-    fName = "temp.xml";
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    fName = bundleDir+"/temp.xml";
-#endif
+    QString tempXML = Sorputils::sorpTempDir().absoluteFilePath("temp.xml");
+    fName = tempXML;
 
     int answer = askToSave();
     switch (answer)
@@ -4493,42 +4325,19 @@ void MainWindow::loadExampleCase()
         QAction*theAction = dynamic_cast<QAction*>(sender());
         fileName = theAction->text();
 
-#ifdef Q_OS_UNIX
-            if(fileName=="Single-effect LiBr-water chiller")
-                tempFileName = QDir(qApp->applicationDirPath()).absolutePath()+"/templates/SEC.xml";
-            else if(fileName=="Double-effect LiBr-water chiller")
-                tempFileName = QDir(qApp->applicationDirPath()).absolutePath()+"/templates/DECP.xml";
-            else if(fileName=="Double-condenser-coupled, triple-effect LiBr-water chiller")
-                tempFileName = QDir(qApp->applicationDirPath()).absolutePath()+"/templates/DCCAP.xml";
-            else if(fileName=="Generator-absorber heat exchanger, water-ammonia heat pump")
-                tempFileName = QDir(qApp->applicationDirPath()).absolutePath()+"/templates/GAX.xml";
-            else if(fileName=="Adiabatic liquid desiccant cycle")
-                tempFileName = QDir(qApp->applicationDirPath()).absolutePath()+"/templates/LDAC.xml";
-            else if(fileName=="Internally cooled/heated liquid desiccant cycle")
-                tempFileName = QDir(qApp->applicationDirPath()).absolutePath()+"/templates/LDAC2.xml";
-#endif
-#ifdef Q_OS_MAC
+        if(fileName=="Single-effect LiBr-water chiller")
+            tempFileName = ":/examples/templates/SEC.xml";
+        else if(fileName=="Double-effect LiBr-water chiller")
+            tempFileName = ":/examples/templates/DECP.xml";
+        else if(fileName=="Double-condenser-coupled, triple-effect LiBr-water chiller")
+            tempFileName = ":/examples/templates/DCCAP.xml";
+        else if(fileName=="Generator-absorber heat exchanger, water-ammonia heat pump")
+            tempFileName = ":/examples/templates/GAX.xml";
+        else if(fileName=="Adiabatic liquid desiccant cycle")
+            tempFileName = ":/examples/templates/LDAC.xml";
+        else if(fileName=="Internally cooled/heated liquid desiccant cycle")
+            tempFileName = ":/examples/templates/LDAC2.xml";
 
-            QDir dir = qApp->applicationDirPath();
-            /*dir.cdUp();*/
-            /*dir.cdUp();*/
-            /*dir.cdUp();*/
-            QString bundleDir(dir.absolutePath());
-
-            if(fileName=="Single-effect LiBr-water chiller")
-                tempFileName = dir.absolutePath()+"/templates/SEC.xml";
-            else if(fileName=="Double-effect LiBr-water chiller")
-                tempFileName = dir.absolutePath()+"/templates/DECP.xml";
-            else if(fileName=="Double-condenser-coupled, triple-effect LiBr-water chiller")
-                tempFileName = dir.absolutePath()+"/templates/DCCAP.xml";
-            else if(fileName=="Generator-absorber heat exchanger, water-ammonia heat pump")
-                tempFileName = dir.absolutePath()+"/templates/GAX.xml";
-            else if(fileName=="Adiabatic liquid desiccant cycle")
-                tempFileName = dir.absolutePath()+"/templates/LDAC.xml";
-            else if(fileName=="Internally cooled/heated liquid desiccant cycle")
-                tempFileName = dir.absolutePath()+"/templates/LDAC2.xml";
-
-#endif
         QFile testFile(tempFileName);
         if(!testFile.exists())
         {
@@ -4537,7 +4346,8 @@ void MainWindow::loadExampleCase()
         }
         else
         {
-#ifdef Q_OS_UNIX
+            QString tempXML = Sorputils::sorpTempDir().absoluteFilePath("temp.xml");
+
             int askSave = askToSave();
             switch(askSave)
             {
@@ -4548,7 +4358,7 @@ void MainWindow::loadExampleCase()
                 //save current file
                 saveFile(globalpara.caseName,false);
                 QString fName;
-                fName = "temp.xml";
+                fName = tempXML;
                 if(globalpara.caseName == fName)
                 {
                     QString name = QFileDialog::getSaveFileName(this,"Save current case to file:","./","XML files(*.xml)");
@@ -4569,16 +4379,17 @@ void MainWindow::loadExampleCase()
                 }
                 //and proceed
             }
-            case 2:
+            case 2: //don't save but load example
             {
-                QFile newFile("temp.xml");
+                QFile newFile(tempXML);
                 if(newFile.exists())
                     newFile.remove();
                 QFile tpFile;
                 tpFile.setFileName(tempFileName);
-                if(tpFile.copy("temp.xml"))
+                if(tpFile.copy(tempXML))
                 {
-                    if(!loadCase("temp.xml"))
+                    newFile.setPermissions(newFile.permissions() | QFileDevice::WriteGroup);
+                    if(!loadCase(tempXML))
                     {
                         globalpara.reportError("Failed to generate temp file from example case.");
                         return;
@@ -4591,85 +4402,8 @@ void MainWindow::loadExampleCase()
                 }
             }
             }
-#endif
-// TODO: condense code for multiple platforms into one, using new utility function
-#ifdef Q_OS_MAC
-            int askSave = askToSave();
-            saveFile(globalpara.caseName,false);
-            QString fName;
-            QDir dir = qApp->applicationDirPath();
-            /*dir.cdUp();*/
-            /*dir.cdUp();*/
-            /*dir.cdUp();*/
-            QString bundleDir(dir.absolutePath());
-            fName = bundleDir+"/temp.xml";
-            switch(askSave)
-            {
-            case 0://cancel
-                break;
-            case 1://save and proceed
-            {
-                //save current file
-
-                if(globalpara.caseName == fName)
-                {
-                    QString name = QFileDialog::getSaveFileName(this,"Save current case to file:","./","XML files(*.xml)");
-                    bool noSave = false;
-                    while(name==""&&(!noSave))
-                    {
-                        QMessageBox * mBox = new QMessageBox(this);
-                        mBox->addButton("Enter a directory",QMessageBox::YesRole);
-                        mBox->addButton("Don's save current case",QMessageBox::NoRole);
-                        mBox->setWindowTitle("Warning");
-                        mBox->setText("Please enter a directory to save the case!");
-                        mBox->setModal(true);
-                        mBox->exec();
-                        if(mBox->buttonRole(mBox->clickedButton())==QMessageBox::YesRole)
-                            name = QFileDialog::getSaveFileName(this,"Save current case to file:","./","XML files(*.xml)");
-                        else if(mBox->buttonRole(mBox->clickedButton())==QMessageBox::NoRole)
-                            noSave = true;
-                    }
-                    if(!noSave)
-                    {
-                        globalpara.caseName = name;
-                        QFile tempFile(fName);
-                        QFile newFile(name);
-                        newFile.remove();
-                        tempFile.copy(globalpara.caseName);
-                        tempFile.remove();
-                    }
-                    else
-                        return;
-                }
-                //and proceed
-            }
-            case 2:
-            {
-                QFile newFile(fName);
-                if(newFile.exists())
-                    newFile.remove();
-                QFile tpFile;
-                tpFile.setFileName(tempFileName);
-                if(tpFile.copy(fName))
-                {
-                    if(!loadCase(fName))
-                    {
-                        globalpara.reportError("Failed to generate temp file from example case.");
-                        return;
-                    }
-                }
-                else
-                {
-                    globalpara.reportError("Failed to find/open");
-                    return;
-                }
-            }
-            }
-#endif
-
         }
     }
-
 }
 
 void MainWindow::on_actionResults_Table_triggered()

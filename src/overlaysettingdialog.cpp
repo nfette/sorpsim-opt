@@ -112,18 +112,8 @@ overlaysetting::overlaysetting(Plot *d_plot,QWidget *parent):
     connect(ui->radioButton,SIGNAL(toggled(bool)),ui->groupBox,SLOT(setVisible(bool)));
 
     QString fName;
-#ifdef Q_OS_UNIX
-    fName = "plotTemp.xml";
-#endif
-#ifdef Q_OS_MAC
-    ui->pushButton->hide();
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    fName = bundleDir+"/plotTemp.xml";
-#endif
+    QString plotTempXML = Sorputils::sorpTempDir().absoluteFilePath("plotTemp.xml");
+    fName = plotTempXML;
 
     QFile file(fName);
     QTextStream stream;
@@ -284,17 +274,9 @@ void overlaysetting::on_buttonBox_accepted()
 
 void overlaysetting::updateXml()
 {
-#ifdef Q_OS_UNIX
-    QFile file("plotTemp.xml");
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    QFile file(bundleDir+"/plotTemp.xml");
-#endif
+    QString plotTempXML = Sorputils::sorpTempDir().absoluteFilePath("plotTemp.xml");
+    QFile file(plotTempXML);
+
     QTextStream stream;
     stream.setDevice(&file);
     QDomDocument doc;
@@ -398,18 +380,8 @@ bool overlaysetting::curveNameUsed(QString name)
 {
     if(name.count()==0)
         return true;
-    QFile file;
-#ifdef Q_OS_UNIX
-    file.setFileName("plotTemp.xml");
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    file.setFileName(bundleDir+"/plotTemp.xml");
-#endif
+    QString plotTempXML = Sorputils::sorpTempDir().absoluteFilePath("plotTemp.xml");
+    QFile file(plotTempXML);
 
     if(!file.open(QIODevice::ReadWrite|QIODevice::Text))
     {

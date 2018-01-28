@@ -20,6 +20,7 @@
 #include <QLayout>
 #include "dataComm.h"
 #include "mainwindow.h"
+#include "sorputils.h"
 
 extern globalparameter globalpara;
 extern MainWindow*theMainwindow;
@@ -129,14 +130,7 @@ bool startDialog::event(QEvent *e)
 
 bool startDialog::loadRecentFiles()
 {
-#ifdef Q_OS_UNIX
-    QString fileName(QDir(qApp->applicationDirPath()).absolutePath()+"/platforms/systemSetting.xml");
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    QString fileName(dir.absolutePath()+"/templates/systemSetting.xml");
-#endif
-    QFile ofile(fileName);
+    QFile ofile(Sorputils::sorpSettings());
     QDomDocument doc;
     if(!ofile.open(QIODevice::ReadOnly|QIODevice::Text))
         return false;

@@ -18,6 +18,7 @@
 #include <QDebug>
 #include "dataComm.h"
 #include "mainwindow.h"
+#include "sorputils.h"
 
 extern globalparameter globalpara;
 
@@ -49,17 +50,9 @@ void helpDialog::on_itemList_itemActivated(QTreeWidgetItem *item, int column)
 
 
     QString itemName = item->text(0);
-    itemName.replace(" ","_");
+    itemName.replace(" ","_");    
 
-#ifdef Q_OS_UNIX
-    QString fileName(QDir(qApp->applicationDirPath()).absolutePath()+"/platforms/systemSetting.xml");
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    QString fileName(dir.absolutePath()+"/templates/systemSetting.xml");
-#endif
-
-    QFile ofile(fileName);
+    QFile ofile(Sorputils::sorpSettings());
     QDomDocument doc;
     if(!ofile.open((QIODevice::ReadOnly|QIODevice::Text))){
         qDebug()<<"no file";
@@ -103,15 +96,7 @@ bool helpDialog::loadList()
 {
     list->clear();
 
-#ifdef Q_OS_UNIX
-    QString fileName(QDir(qApp->applicationDirPath()).absolutePath()+"/platforms/systemSetting.xml");
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    QString fileName(dir.absolutePath()+"/templates/systemSetting.xml");
-#endif
-
-    QFile ofile(fileName);
+    QFile ofile(Sorputils::sorpSettings());
     QDomDocument doc;
     if(!ofile.open((QIODevice::ReadOnly|QIODevice::Text))){
         qDebug()<<"no file";

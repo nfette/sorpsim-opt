@@ -187,21 +187,9 @@ bool newParaPlotDialog::setupXml()
     if(mode==2)//from plot re-select
     {
         QFile oFile(globalpara.caseName);
-#ifdef Q_OS_UNIX
-        oFile.copy("plotTemp.xml");
-        file.setFileName("plotTemp.xml");
-#endif
-
-#ifdef Q_OS_MAC
-        QDir dir = qApp->applicationDirPath();
-        /*dir.cdUp();*/
-        /*dir.cdUp();*/
-        /*dir.cdUp();*/
-        QString bundleDir(dir.absolutePath());
-        oFile.copy(bundleDir+"/plotTemp.xml");
-        file.setFileName(bundleDir+"/plotTemp.xml");
-#endif
-
+        QString plotTempXML = Sorputils::sorpTempDir().absoluteFilePath("plotTemp.xml");
+        oFile.copy(plotTempXML);
+        file.setFileName(plotTempXML);
     }
     else file.setFileName(globalpara.caseName);
 
@@ -372,17 +360,10 @@ bool newParaPlotDialog::plotNameUsed(QString name)
 //    else if(mode==1)
 //        file.setFileName("tableTemp.xml");
     else /*if(mode==2)*/
-#ifdef Q_OS_UNIX
-        file.setFileName("plotTemp.xml");
-#endif
-#ifdef Q_OS_MAC
-    dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    file.setFileName(bundleDir+"/plotTemp.xml");
-#endif
+    {
+        QString plotTempXML = Sorputils::sorpTempDir().absoluteFilePath("plotTemp.xml");
+        file.setFileName(plotTempXML);
+    }
 
     if(!file.open(QIODevice::ReadWrite|QIODevice::Text))
     {
@@ -496,17 +477,10 @@ bool newParaPlotDialog::readTheFile(QString tableName)
 //    else if(mode==1)
 //        file.setFileName("tableTemp.xml");
     else if(mode==2)
-#ifdef Q_OS_UNIX
-        file.setFileName("plotTemp.xml");
-#endif
-#ifdef Q_OS_MAC
-    dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    file.setFileName(bundleDir+"/plotTemp.xml");
-#endif
+    {
+        QString plotTempXML = Sorputils::sorpTempDir().absoluteFilePath("plotTemp.xml");
+        file.setFileName(plotTempXML);
+    }
 
     QDomDocument doc;
 
@@ -631,17 +605,10 @@ bool newParaPlotDialog::setTable()
 //    if(mode==1)
 //        file.setFileName("tableTemp.xml");
     else if(mode ==2)
-#ifdef Q_OS_UNIX
-        file.setFileName("plotTemp.xml");
-#endif
-#ifdef Q_OS_MAC
-    dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    file.setFileName(bundleDir+"/plotTemp.xml");
-#endif
+    {
+        QString plotTempXML = Sorputils::sorpTempDir().absoluteFilePath("plotTemp.xml");
+        file.setFileName(plotTempXML);
+    }
 
     QDomDocument doc;
 

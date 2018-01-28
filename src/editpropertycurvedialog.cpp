@@ -23,6 +23,7 @@
 #include "unitconvert.h"
 #include "unit.h"
 #include "node.h"
+#include "sorputils.h"
 #include <QMessageBox>
 #include <QKeyEvent>
 #include <QDebug>
@@ -87,6 +88,7 @@ editPropertyCurveDialog::editPropertyCurveDialog(Plot*d_plot, QList<QwtPlotCurve
     ui->setupUi(this);
 
     setWindowFlags(Qt::Dialog);
+    setWindowModality(Qt::WindowModal);
     setWindowTitle("Edit property curve");
 
     QLayout *mainLayout = layout();
@@ -106,19 +108,7 @@ editPropertyCurveDialog::editPropertyCurveDialog(Plot*d_plot, QList<QwtPlotCurve
 
     ui->seleCycleButton->hide();
 
-#ifdef Q_OS_UNIX
-    QFile file("plotTemp.xml");
-    setWindowModality(Qt::NonModal);
-#endif
-#ifdef Q_OS_MAC
-    setWindowModality(Qt::WindowModal);
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    QFile file(bundleDir+"/plotTemp.xml");
-#endif
+    QFile file(Sorputils::sorpTempDir().absoluteFilePath("plotTemp.xml"));
     QTextStream stream;
     stream.setDevice(&file);
     QDomDocument doc;
@@ -640,17 +630,7 @@ void editPropertyCurveDialog::on_okButton_clicked()
 
 void editPropertyCurveDialog::updateXml()
 {
-#ifdef Q_OS_UNIX
-    QFile file("plotTemp.xml");
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    QFile file(bundleDir+"/plotTemp.xml");
-#endif
+    QFile file(Sorputils::sorpTempDir().absoluteFilePath("plotTemp.xml"));
     QTextStream stream;
     stream.setDevice(&file);
     QDomDocument doc;
@@ -749,18 +729,8 @@ void editPropertyCurveDialog::updateXml()
 
 void editPropertyCurveDialog::removeOld()
 {
-
-#ifdef Q_OS_UNIX
-            QFile file("plotTemp.xml");
-        #endif
-        #ifdef Q_OS_MAC
-            QDir dir = qApp->applicationDirPath();
-            /*dir.cdUp();*/
-            /*dir.cdUp();*/
-            /*dir.cdUp();*/
-            QString bundleDir(dir.absolutePath());
-            QFile file(bundleDir+"/plotTemp.xml");
-        #endif
+// TODO: fix indentation
+            QFile file(Sorputils::sorpTempDir().absoluteFilePath("plotTemp.xml"));
             QTextStream stream;
             stream.setDevice(&file);
             QDomDocument doc;

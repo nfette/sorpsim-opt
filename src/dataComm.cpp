@@ -24,6 +24,7 @@
 #include "unit.h"
 #include "node.h"
 #include "sorpsimEngine.h"
+#include "sorputils.h"
 
 extern globalparameter globalpara;
 extern int globalcount;
@@ -399,17 +400,8 @@ bool globalparameter::findNextPtxPoint(Node *thisNode, Node *StartingNode)
 
 void globalparameter::removeRecentFile(QString delFileName)
 {
-#ifdef Q_OS_UNIX
-    QString fileName(QDir(qApp->applicationDirPath()).absolutePath()+"/platforms/systemSetting.xml");
-#endif
 
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    QString fileName(dir.absolutePath()+"/templates/systemSetting.xml");
-#endif
-
-
-    QFile ofile(fileName);
+    QFile ofile(Sorputils::sorpSettings());
     QTextStream stream;
     QDomDocument doc;
     if(!ofile.open(QIODevice::ReadWrite|QIODevice::Text))

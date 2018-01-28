@@ -25,6 +25,7 @@
 #include "dataComm.h"
 #include <qwt_symbol.h>
 #include "editpropertycurvedialog.h"
+#include "sorputils.h"
 
 extern globalparameter globalpara;
 extern MainWindow* theMainwindow;
@@ -557,17 +558,7 @@ void curvesetting::on_deleteCurveButton_clicked()
 
     QString plotTitle = set_plot->title().text();
 
-#ifdef Q_OS_UNIX
-    QFile file("plotTemp.xml");
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    QFile file(bundleDir+"/plotTemp.xml");
-#endif
+    QFile file(Sorputils::sorpTempDir().absolutePath()+"/plotTemp.xml");
     QTextStream stream;
     stream.setDevice(&file);
     QDomDocument doc;

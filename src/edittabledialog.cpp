@@ -279,17 +279,8 @@ void editTableDialog::on_cancelButton_clicked()
 
 bool editTableDialog::setupXml()
 {
-#ifdef Q_OS_UNIX
-    QFile file("tableTemp.xml");
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    QFile file(bundleDir+"/tableTemp.xml");
-#endif
+
+    QFile file(Sorputils::sorpTempDir().absoluteFilePath("tableTemp.xml"));
     QTextStream stream;
     stream.setDevice(&file);
 
@@ -444,18 +435,7 @@ bool editTableDialog::setupXml()
 bool editTableDialog::loadTheTable()
 {
     oldTableName = tableName;
-#ifdef Q_OS_UNIX
-    QFile file("tableTemp.xml");
-#endif
-#ifdef Q_OS_MAC
-    QDir dir = qApp->applicationDirPath();
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    /*dir.cdUp();*/
-    QString bundleDir(dir.absolutePath());
-    QFile file(bundleDir+"/tableTemp.xml");
-#endif
-
+    QFile file(Sorputils::sorpTempDir().absoluteFilePath("tableTemp.xml"));
     QTextStream stream;
     stream.setDevice(&file);
 
@@ -662,19 +642,8 @@ bool editTableDialog::tableNameUsed(QString name)
     {
         if(tableName.count() == 0)
             return true;
-#ifdef Q_OS_UNIX
-        QFile file("tableTemp.xml");
-#endif
-#ifdef Q_OS_MAC
-        QDir dir = qApp->applicationDirPath();
-        /*dir.cdUp();*/
-        /*dir.cdUp();*/
-        /*dir.cdUp();*/
-        QString bundleDir(dir.absolutePath());
-        QFile file(bundleDir+"/tableTemp.xml");
-#endif
 
-
+        QFile file(Sorputils::sorpTempDir().absoluteFilePath("tableTemp.xml"));
         if(!file.open(QIODevice::ReadWrite|QIODevice::Text))
         {
             globalpara.reportError("Fail to open case file to check if the table name is used.",this);
