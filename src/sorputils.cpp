@@ -10,13 +10,18 @@
 #include <QCoreApplication>
 #include <QFileDevice>
 
+#ifdef Q_OS_WIN32
+extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
+#endif
 extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 
 void Sorputils::init()
 {
+#ifdef Q_OS_WIN32
     // After copying files from QResources, may want to enable WriteGroup permissions
     // See documentation for QFileDevice
     qt_ntfs_permission_lookup++; // turn checking on
+#endif
 }
 
 QMap<QString, QDomElement> Sorputils::mapElementsByAttribute(const QDomNodeList &nodes, QString attr)

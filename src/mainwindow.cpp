@@ -783,7 +783,7 @@ void MainWindow::startWindow()
             QFile tpFile(tempFileName);
             if(tpFile.copy(tempXML))
             {
-                newFile.setPermissions(newFile.permissions() | QFileDevice::WriteGroup);
+                newFile.setPermissions(newFile.permissions() | QFileDevice::WriteGroup | QFileDevice::WriteUser);
                 if(!loadCase(tempXML))
                     startWindow();
             }
@@ -4388,7 +4388,7 @@ void MainWindow::loadExampleCase()
                 tpFile.setFileName(tempFileName);
                 if(tpFile.copy(tempXML))
                 {
-                    newFile.setPermissions(newFile.permissions() | QFileDevice::WriteGroup);
+                    newFile.setPermissions(newFile.permissions() | QFileDevice::WriteGroup | QFileDevice::WriteUser);
                     if(!loadCase(tempXML))
                     {
                         globalpara.reportError("Failed to generate temp file from example case.");
