@@ -1635,7 +1635,7 @@ bool MainWindow::loadOutFile()
                 }while(!line.contains("NO. OF UNITS"));
                 line.replace("NO. OF UNITS:","");
                 unitCount = line.toInt();
-                std::vector<int[7]> sps(unitCount);
+                std::vector<std::vector<int>> sps(unitCount, std::vector<int>(7));
 
                 do
                 {

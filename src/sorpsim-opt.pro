@@ -15,14 +15,19 @@ win32:CONFIG += console
 #QWTPATH=/usr/local/qwt-6.1.3
 win32:INCLUDEPATH += $$(QWTPATH)/src
 win32:DEPENDPATH += $$(QWTPATH)/src
-unix:INCLUDEPATH += $$(QWTPATH)/include
-unix:DEPENDPATH += $$(QWTPATH)/include
+linux:INCLUDEPATH += $$(QWTPATH)/include
+linux:DEPENDPATH += $$(QWTPATH)/include
+#macx:INCLUDEPATH += ${QWT_ROOT}/src
 
 win32:CONFIG(release, debug|release): LIBS += -L$$(QWTPATH)/lib/ -lqwt
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$(QWTPATH)/lib/ -lqwtd
-else:unix: LIBS += -L$$(QWTPATH)/lib -lqwt
-
-#include(c:/qwt-6.1.0/qwt.prf)
+else:linux: LIBS += -L$$(QWTPATH)/lib -lqwt
+else:macx {
+    LIBS += -F${QWT_ROOT}/lib/ -framework qwt
+}
+#macx {
+#    include(../../qwt-6.1.3/qwt.prf)
+#}
 #####include the qwt library for Mac compilation
 #####directory might be different for different machine settings
 
