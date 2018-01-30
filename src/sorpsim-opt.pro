@@ -99,17 +99,19 @@ macx {
 BUNDLE_NAME = $${TARGET}.app
 BUNDLE_PATH = $$OUT_PWD/$$BUNDLE_NAME
 EXE_PATH = $$BUNDLE_PATH/Contents/MacOS/$$TARGET
-deployall.target = deploy
+QWT_DEST = $$BUNDLE_PATH/Contents/Frameworks/qwt.framework
+#deployall.target = deploy
 deployall.depends = deployqwt deployqt
 MACDEPLOY = macdeployqt
 deployqt.depends = deployqwt
 deployqt.commands = $$MACDEPLOY $$BUNDLE_PATH
-deployqwt.depends = deployqwt1 deployqwt2 deployqwt3
-deployqwt1.commands = mkdir -p $$BUNDLE_PATH/Contents/Frameworks
-deployqwt2.depends = deployqwt1
-deployqwt2.commands = cp -Rf $$QWT_INSTALL_LIBS/qwt.framework $$BUNDLE_PATH/Contents/Frameworks/qwt.framework
-deployqwt3.commands = install_name_tool -change qwt.framework/Versions/6/qwt @rpath/qwt.framework/Versions/6/qwt $$EXE_PATH
-QMAKE_EXTRA_TARGETS += deployall deployqt deployqwt deployqwt1 deployqwt2 deployqwt3
+deployqwt.depends = deployqwt1 deployqwt2
+deployqwt1.target = $$BUNDLE_NAME/Contents/Frameworks/qwt.framework/qwt
+deployqwt1.commands = test -d $$BUNDLE_PATH/Contents/Frameworks || mkdir -p $$BUNDLE_PATH/Contents/Frameworks $$escape_expand(\\n\\t)
+deployqwt1.commands += $$QMAKE_DEL_TREE $$QWT_DEST $$escape_expand(\\n\\t)
+deployqwt1.commands += $$QMAKE_COPY $$QWT_INSTALL_LIBS/qwt.framework $$QWT_DEST
+deployqwt2.commands = install_name_tool -change qwt.framework/Versions/6/qwt @executable_path/../Frameworks/qwt.framework/Versions/6/qwt $$EXE_PATH
+QMAKE_EXTRA_TARGETS += deployall deployqt deployqwt deployqwt1 deployqwt2
 }
 
 SOURCES += main.cpp \
