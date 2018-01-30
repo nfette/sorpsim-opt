@@ -22,14 +22,15 @@ linux:DEPENDPATH += $$(QWTPATH)/include
 win32:CONFIG(release, debug|release): LIBS += -L$$(QWTPATH)/lib/ -lqwt
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$(QWTPATH)/lib/ -lqwtd
 else:linux: LIBS += -L$$(QWTPATH)/lib -lqwt
-else:macx {
-    LIBS += -F${QWT_ROOT}/lib/ -framework qwt
-}
-#macx {
-#    include(../../qwt-6.1.3/qwt.prf)
+#else:macx {
+#    LIBS += -F${QWT_ROOT}/lib/ -framework qwt
 #}
-#####include the qwt library for Mac compilation
-#####directory might be different for different machine settings
+macx {
+    # include the qwt library for Mac compilation
+    # directory might be different for different machine settings
+    # set QWT_ROOT in your environment
+    include($$(QWT_ROOT)/features/qwt.prf)
+}
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -78,6 +79,7 @@ mythingb.files = templates/*
 INSTALLS += mythinga \
 #    mythingb
 
+win32 {
 # Usage(Windows only): make deploy
 # Drops needed Qt libraries into the build directory so you can run without IDE.
 deployall.target = deploy
@@ -91,6 +93,24 @@ CONFIG(release, debug|release){ qwtdll = $$(QWTPATH)/lib/qwt.dll }
 deployqwt.commands = $$copySafe($$qwtdll, $$TARGET_PATH)
 
 QMAKE_EXTRA_TARGETS += deployall deployqt deployqwt
+}
+
+macx {
+BUNDLE_NAME = $${TARGET}.app
+BUNDLE_PATH = $$OUT_PWD/$$BUNDLE_NAME
+EXE_PATH = $$BUNDLE_PATH/Contents/MacOS/$$TARGET
+deployall.target = deploy
+deployall.depends = deployqwt deployqt
+MACDEPLOY = macdeployqt
+deployqt.depends = deployqwt
+deployqt.commands = $$MACDEPLOY $$BUNDLE_PATH
+deployqwt.depends = deployqwt1 deployqwt2 deployqwt3
+deployqwt1.commands = mkdir -p $$BUNDLE_PATH/Contents/Frameworks
+deployqwt2.depends = deployqwt1
+deployqwt2.commands = cp -Rf $$QWT_INSTALL_LIBS/qwt.framework $$BUNDLE_PATH/Contents/Frameworks/qwt.framework
+deployqwt3.commands = install_name_tool -change qwt.framework/Versions/6/qwt @rpath/qwt.framework/Versions/6/qwt $$EXE_PATH
+QMAKE_EXTRA_TARGETS += deployall deployqt deployqwt deployqwt1 deployqwt2 deployqwt3
+}
 
 SOURCES += main.cpp \
     unitconvert.cpp \
