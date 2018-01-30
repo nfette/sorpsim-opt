@@ -783,7 +783,7 @@ void MainWindow::startWindow()
             QFile tpFile(tempFileName);
             if(tpFile.copy(tempXML))
             {
-                newFile.setPermissions(newFile.permissions() | QFileDevice::WriteGroup | QFileDevice::WriteUser);
+                newFile.setPermissions(newFile.permissions() | QFileDevice::WriteUser);
                 if(!loadCase(tempXML))
                     startWindow();
             }
@@ -3815,14 +3815,14 @@ void MainWindow::evokeAbout()
     QMessageBox aboutDialog(this);
     aboutDialog.setWindowTitle("Welcome to SorpSim");
     aboutDialog.setTextFormat(Qt::RichText);
-    aboutDialog.setText("<p align='center'><font size = 8 color = blue style = 'italic'>SorpSim 1.0</font><br>"
+    aboutDialog.setText("<p align='center'><font size = 8 color = blue style = 'italic'>SorpSim 1.2</font><br>"
                        "<br>"
                         // fixed: Create a plaintext file for license
                         // TODO: update copyright holders to match code
                        "<font size = 2>Copyright 2015, UT-Battelle, LLC<br>"
-                        "Copyright 2018-2018, Nicholas Fette<br>"
+                        "Copyright 2017-2018, Nicholas Fette<br>"
                        "All rights reserved<br>"
-                       "Sorption system Simulation program (SorpSim), Version 1.1<br>"
+                       "Sorption system Simulation program (SorpSim), Version 1.2<br>"
                        "OPEN SOURCE LICENSE</font></p>"
                         // TODO: update license
                         // TODO: wrap with scroll area from here ...
@@ -3852,7 +3852,7 @@ for the Oak Ridge National Laboratory under funding of the U.S. Department of En
                        "<br>"
                         "SorpSim is developed using open source Qt under LGPL license.</font></p>"
                         // TODO: ... to here.
-                       "<a href=\"https://github.com/oabdelaziz/SorpSim\">Source code, license, and more information...</a><br>");
+                       "<a href=\"https://github.com/nfette/sorpsim-opt\">Source code, license, and more information...</a><br>");
     aboutDialog.exec();
 }
 
@@ -4388,7 +4388,7 @@ void MainWindow::loadExampleCase()
                 tpFile.setFileName(tempFileName);
                 if(tpFile.copy(tempXML))
                 {
-                    newFile.setPermissions(newFile.permissions() | QFileDevice::WriteGroup | QFileDevice::WriteUser);
+                    newFile.setPermissions(newFile.permissions() | QFileDevice::WriteUser);
                     if(!loadCase(tempXML))
                     {
                         globalpara.reportError("Failed to generate temp file from example case.");
