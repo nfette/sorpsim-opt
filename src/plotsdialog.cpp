@@ -85,7 +85,7 @@ plotsDialog::plotsDialog(QString startPlot, bool fromTable, QWidget *parent) :
     tabs = ui->tabWidget;
 //    setContextMenuPolicy(Qt::NoContextMenu);
     setWindowFlags(Qt::Dialog);
-    setWindowModality(Qt::WindowModal);
+    setWindowModality(Qt::ApplicationModal);
     setWindowTitle("Plots");
     // Allows us to kill this with this->close(), as used
     // throughout code since a myScene object keeps a pointer to this.
@@ -506,6 +506,7 @@ void plotsDialog::selected(const QPolygon &)
     showInfo();
 }
 
+// \todo this still needs work!
 void plotsDialog::overlay()
 {
     Plot* currentPlot = dynamic_cast<Plot*>(tabs->currentWidget());
