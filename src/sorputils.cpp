@@ -54,12 +54,25 @@ QDir Sorputils::sorpResourceDir()
 
 QDir Sorputils::sorpTempDir()
 {
+#if defined Q_OS_MACOS
+    QDir result = sorpResourceDir();
+    if (!result.exists("temp"))
+        result.mkdir("temp");
+    result.cd("temp");
+    return result;
+#else
     return QDir();
+#endif
 }
 
 QString Sorputils::sorpSettings()
 {
     return sorpResourceDir().absoluteFilePath("settings/systemSetting.xml");
+}
+
+QString Sorputils::sorpLog()
+{
+    return sorpResourceDir().absoluteFilePath("log");
 }
 
 Sorputils::Sorputils()

@@ -99,7 +99,7 @@
 #include "calcdetaildialog.h"
 #include "guessdialog.h"
 #include "sorputils.h"
-
+#include "version.h"
 
 /*! \name Units and links
 
@@ -3815,15 +3815,16 @@ void MainWindow::evokeAbout()
     QMessageBox aboutDialog(this);
     aboutDialog.setWindowTitle("Welcome to SorpSim");
     aboutDialog.setTextFormat(Qt::RichText);
-    aboutDialog.setText("<p align='center'><font size = 8 color = blue style = 'italic'>SorpSim 1.2</font><br>"
+    aboutDialog.setText("<p align='center'><font size=8 color=blue style='italic'>SorpSim&nbsp;</font>"
+                        + QString("<font size=2 color=blue>%1</font><br>").arg(SORP_VERSION) +
                        "<br>"
                         // fixed: Create a plaintext file for license
                         // TODO: update copyright holders to match code
                        "<font size = 2>Copyright 2015, UT-Battelle, LLC<br>"
                         "Copyright 2017-2018, Nicholas Fette<br>"
                        "All rights reserved<br>"
-                       "Sorption system Simulation program (SorpSim), Version 1.2<br>"
-                       "OPEN SOURCE LICENSE</font></p>"
+                       "Sorption system Simulation program (SorpSim)<br>"
+                       "OPEN SOURCE LICENSE V1</font></p>"
                         // TODO: update license
                         // TODO: wrap with scroll area from here ...
                        "<p align = 'left'><font size = 2>Subject to the conditions of this License, UT-Bettelle, LLC (the 'Licensor')\

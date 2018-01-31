@@ -23,7 +23,7 @@ public:
     static void init();
 
     //!
-    //! \brief mapElementsByAttribute lets you use an attribute as a key
+    //! \brief mapElementsByAttribute lets you use an attribute as a key for traversing a QDomNodeList
     //!
     //! Assumes that all the nodes in the given list can be cast toElement().
     //!
@@ -36,6 +36,31 @@ public:
     //!
     static QMap<QString, QDomElement> mapElementsByAttribute(const QDomNodeList &, QString attr);
 
+    /// \name Application file accessors
+    ///
+    /// Aside from the case files, the GUI part of the application uses files it owns,
+    /// namely settings, log, and temporary files.
+    /// We usually want to locate these relative to the executable,
+    /// but on different operating systems we may want different behavior.
+    /// So all code in this project should use these functions to determine paths.
+    ///
+    /// Expected behavior
+    /// - On Windows and Linux, the executable is just a file, and it can look for all its files in
+    ///   the same directory (or nearby).
+    /// - On Mac, the executable lives in an app bundle subpath and may want to locate files in a
+    ///   nearby folder called "../Resources".
+    /// - For now, I expect users to run the executable without installing to system directories.
+    ///   (TODO) For system wide installations, we would want to fix standard
+    ///   paths in user directories.
+    /// - It is possible for users to run the program via command line intentionally
+    ///   in an arbitrary "current" directory, and they may want to see temp or log files go there.
+    ///   But probably not. On Mac, launching through Finder may set the current directory as /,
+    ///   and other platforms vary as well. So probably it is best to avoid assigning much meaning
+    ///   to the current directory at launch.
+    ///
+    /// \{
+    ///
+
     /// Returns the directory where resources are based.
     /// Resources are files created at install time, including read-only examples and help.
     static QDir sorpResourceDir();
@@ -46,6 +71,10 @@ public:
 
     /// Returns the path to the settings file.
     static QString sorpSettings();
+
+    static QString sorpLog();
+
+    /// \}
 
 private:
     Sorputils();

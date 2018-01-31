@@ -43,6 +43,16 @@ TEMPLATE = app
 # Conveniences for building to debug and deploy
 #----------------------------------------------
 
+defineReplace(sorpVersion){
+    SORPVERSION = $$system("git describe --tags")
+    SORPVERSION_DEFINE = \\\"$$quote($$SORPVERSION)\\\"
+    message($$SORPVERSION_DEFINE)
+    export(SORPVERSION)
+    return($$SORPVERSION_DEFINE)
+}
+
+DEFINES += SORPVERSION=$$sorpVersion()
+
 # https://stackoverflow.com/questions/3984104/qmake-how-to-copy-a-file-to-the-output
 # Copies the given files to the destination directory
 defineReplace(copySafe){
@@ -100,8 +110,12 @@ BUNDLE_NAME = $${TARGET}.app
 BUNDLE_PATH = $$OUT_PWD/$$BUNDLE_NAME
 EXE_PATH = $$BUNDLE_PATH/Contents/MacOS/$$TARGET
 QWT_DEST = $$BUNDLE_PATH/Contents/Frameworks/qwt.framework
-#deployall.target = deploy
-deployall.depends = deployqwt deployqt
+# Usage: make deploy
+# - Installs qwt.framework in the bundle (deployqwt)
+# - Runs the Qt deployment tool (deployqt)
+# - Edits the Info.plist file for "Get info" dialogs (deployinfo)
+deployall.target = deploy
+deployall.depends = deployqwt deployqt deployinfo
 MACDEPLOY = macdeployqt
 deployqt.depends = deployqwt
 deployqt.commands = $$MACDEPLOY $$BUNDLE_PATH
@@ -110,8 +124,13 @@ deployqwt1.target = $$BUNDLE_NAME/Contents/Frameworks/qwt.framework/qwt
 deployqwt1.commands = test -d $$BUNDLE_PATH/Contents/Frameworks || mkdir -p $$BUNDLE_PATH/Contents/Frameworks $$escape_expand(\\n\\t)
 deployqwt1.commands += $$QMAKE_DEL_TREE $$QWT_DEST $$escape_expand(\\n\\t)
 deployqwt1.commands += $$QMAKE_COPY_DIR $$QWT_INSTALL_LIBS/qwt.framework $$QWT_DEST
+deployqwt2.depends = $(TARGET)
 deployqwt2.commands = install_name_tool -change qwt.framework/Versions/6/qwt @executable_path/../Frameworks/qwt.framework/Versions/6/qwt $$EXE_PATH
-QMAKE_EXTRA_TARGETS += deployall deployqt deployqwt deployqwt1 deployqwt2
+deployinfo.depends = $(TARGET)
+deployinfo.commands = defaults write $$BUNDLE_PATH/Contents/Info.plist \"CFBundleGetInfoString\" \'$$SORPVERSION\' $$escape_expand(\\n\\t)
+deployinfo.commands += defaults write $$BUNDLE_PATH/Contents/Info.plist \"CFBundleIdentifier\" \'info.nfette.sorpsim-opt\'
+
+QMAKE_EXTRA_TARGETS += deployall deployqt deployqwt deployqwt1 deployqwt2 deployinfo
 
 # This goes with something else above ... need to improve structure
 macx:mythinga.path = $$BUNDLE_PATH/Contents/Resources/settings
@@ -246,7 +265,8 @@ HEADERS  += \
     unitsettingdialog.h \
     curvesettingdialog.h \
     ifixdialog.h \
-    sorputils.h
+    sorputils.h \
+    version.h
 
 FORMS    += \
     treedialog.ui \
