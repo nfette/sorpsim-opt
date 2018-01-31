@@ -11,12 +11,19 @@ activated cooling and heating technologies.
 
 # Installing and Running
 
-Look on the [releases](https://github.com/nfette/SorpSim/releases)
+## On Windows and Mac
+
+Look on the [releases](https://github.com/nfette/sorpsim-opt/releases)
 tab to download the latest released binaries.
-You can use the self-extracting installer or the archive file appropriate for
-your system. Run the installer or extract the files to the folder of your
-choice, then run the executable (SorpSim).
-(I may need someone to build the project on Mac OS.)
+Get the archive file appropriate for your system.
+Simply extract the files to the folder of your
+choice, then run the executable (sorpsim-opt).
+
+## Linux
+
+If you use Linux, I'm expecting you to build it yourself. On Ubuntu you can get the prerequisites:
+* apt install libqwt-qt5 qtbase5-dev
+
 
 # Building
 
@@ -26,7 +33,7 @@ To compile this yourself you need to install these prerequisites:
 * Qt version >5 (tested with 5.9.3)
 * Qwt http://qwt.sourceforge.net/ (follow instructions to build and install)
 
-Configure the project file, SorpSim.pro.
+Configure the project file, sorpsim-opt.pro.
 
 * Set the paths to find Qwt library and (optional) sources
 * Note that there is a target called 'install' that just copies the extra files
@@ -47,8 +54,8 @@ make. Enter "install" (no quotes) in the extra arguments tab.
 
 ## Building with qmake
 
-* qmake SorpSim.pro
-* make
+* qmake sorpsim-opt.pro
+* make -j
 * make install
 
 ## Deployment

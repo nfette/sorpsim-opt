@@ -15,13 +15,15 @@ win32:CONFIG += console
 #QWTPATH=/usr/local/qwt-6.1.3
 win32:INCLUDEPATH += $$(QWTPATH)/src
 win32:DEPENDPATH += $$(QWTPATH)/src
-linux:INCLUDEPATH += $$(QWTPATH)/include
-linux:DEPENDPATH += $$(QWTPATH)/include
+#linux:INCLUDEPATH += $$(QWTPATH)/include
+#linux:DEPENDPATH += $$(QWTPATH)/include
+linux:INCLUDEPATH += /usr/include/qwt
 #macx:INCLUDEPATH += ${QWT_ROOT}/src
 
 win32:CONFIG(release, debug|release): LIBS += -L$$(QWTPATH)/lib/ -lqwt
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$(QWTPATH)/lib/ -lqwtd
-else:linux: LIBS += -L$$(QWTPATH)/lib -lqwt
+#else:linux: LIBS += -L$$(QWTPATH)/lib -lqwt
+else:linux: LIBS += -L/usr/lib -lqwt-qt5
 #else:macx {
 #    LIBS += -F${QWT_ROOT}/lib/ -framework qwt
 #}
