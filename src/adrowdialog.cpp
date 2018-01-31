@@ -37,6 +37,7 @@ adRowDialog::adRowDialog(QWidget *parent) :
     ui->insertButton->setChecked(true);
     ui->atTopButton->setChecked(true);
     setWindowFlags(Qt::Dialog);
+    setWindowModality(Qt::WindowModal);
     ui->noRunsb->setMinimum(0);
     ui->aftetsb->setMinimum(0);
 

@@ -84,7 +84,9 @@ tableDialog::tableDialog(unit * dummy, QString startTable, QWidget * parent) :
     ui(new Ui::tableDialog)
 {
     ui->setupUi(this);
-    setWindowModality(Qt::WindowModal);
+    // On Mac, window modal dialogs don't have buttons to close. Have to add them yourself.
+    //setWindowModality(Qt::WindowModal);
+    setWindowModality(Qt::ApplicationModal);
     setWindowFlags(Qt::Dialog);
     setAttribute(Qt::WA_DeleteOnClose);
 

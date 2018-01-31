@@ -15,16 +15,22 @@ win32:CONFIG += console
 #QWTPATH=/usr/local/qwt-6.1.3
 win32:INCLUDEPATH += $$(QWTPATH)/src
 win32:DEPENDPATH += $$(QWTPATH)/src
-unix:INCLUDEPATH += $$(QWTPATH)/include
-unix:DEPENDPATH += $$(QWTPATH)/include
+linux:INCLUDEPATH += $$(QWTPATH)/include
+linux:DEPENDPATH += $$(QWTPATH)/include
+#macx:INCLUDEPATH += ${QWT_ROOT}/src
 
 win32:CONFIG(release, debug|release): LIBS += -L$$(QWTPATH)/lib/ -lqwt
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$(QWTPATH)/lib/ -lqwtd
-else:unix: LIBS += -L$$(QWTPATH)/lib -lqwt
-
-#include(c:/qwt-6.1.0/qwt.prf)
-#####include the qwt library for Mac compilation
-#####directory might be different for different machine settings
+else:linux: LIBS += -L$$(QWTPATH)/lib -lqwt
+#else:macx {
+#    LIBS += -F${QWT_ROOT}/lib/ -framework qwt
+#}
+macx {
+    # include the qwt library for Mac compilation
+    # directory might be different for different machine settings
+    # set QWT_ROOT in your environment
+    include($$(QWT_ROOT)/features/qwt.prf)
+}
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -36,6 +42,16 @@ TEMPLATE = app
 #----------------------------------------------
 # Conveniences for building to debug and deploy
 #----------------------------------------------
+
+defineReplace(sorpVersion){
+    SORPVERSION = $$system("git describe --tags")
+    SORPVERSION_DEFINE = \\\"$$quote($$SORPVERSION)\\\"
+    message($$SORPVERSION_DEFINE)
+    export(SORPVERSION)
+    return($$SORPVERSION_DEFINE)
+}
+
+DEFINES += SORPVERSION=$$sorpVersion()
 
 # https://stackoverflow.com/questions/3984104/qmake-how-to-copy-a-file-to-the-output
 # Copies the given files to the destination directory
@@ -73,6 +89,7 @@ mythingb.files = templates/*
 INSTALLS += mythinga \
 #    mythingb
 
+win32 {
 # Usage(Windows only): make deploy
 # Drops needed Qt libraries into the build directory so you can run without IDE.
 deployall.target = deploy
@@ -86,6 +103,38 @@ CONFIG(release, debug|release){ qwtdll = $$(QWTPATH)/lib/qwt.dll }
 deployqwt.commands = $$copySafe($$qwtdll, $$TARGET_PATH)
 
 QMAKE_EXTRA_TARGETS += deployall deployqt deployqwt
+}
+
+macx {
+BUNDLE_NAME = $${TARGET}.app
+BUNDLE_PATH = $$OUT_PWD/$$BUNDLE_NAME
+EXE_PATH = $$BUNDLE_PATH/Contents/MacOS/$$TARGET
+QWT_DEST = $$BUNDLE_PATH/Contents/Frameworks/qwt.framework
+# Usage: make deploy
+# - Installs qwt.framework in the bundle (deployqwt)
+# - Runs the Qt deployment tool (deployqt)
+# - Edits the Info.plist file for "Get info" dialogs (deployinfo)
+deployall.target = deploy
+deployall.depends = deployqwt deployqt deployinfo
+MACDEPLOY = macdeployqt
+deployqt.depends = deployqwt
+deployqt.commands = $$MACDEPLOY $$BUNDLE_PATH
+deployqwt.depends = deployqwt1 deployqwt2
+deployqwt1.target = $$BUNDLE_NAME/Contents/Frameworks/qwt.framework/qwt
+deployqwt1.commands = test -d $$BUNDLE_PATH/Contents/Frameworks || mkdir -p $$BUNDLE_PATH/Contents/Frameworks $$escape_expand(\\n\\t)
+deployqwt1.commands += $$QMAKE_DEL_TREE $$QWT_DEST $$escape_expand(\\n\\t)
+deployqwt1.commands += $$QMAKE_COPY_DIR $$QWT_INSTALL_LIBS/qwt.framework $$QWT_DEST
+deployqwt2.depends = $(TARGET)
+deployqwt2.commands = install_name_tool -change qwt.framework/Versions/6/qwt @executable_path/../Frameworks/qwt.framework/Versions/6/qwt $$EXE_PATH
+deployinfo.depends = $(TARGET)
+deployinfo.commands = defaults write $$BUNDLE_PATH/Contents/Info.plist \"CFBundleGetInfoString\" \'$$SORPVERSION\' $$escape_expand(\\n\\t)
+deployinfo.commands += defaults write $$BUNDLE_PATH/Contents/Info.plist \"CFBundleIdentifier\" \'info.nfette.sorpsim-opt\'
+
+QMAKE_EXTRA_TARGETS += deployall deployqt deployqwt deployqwt1 deployqwt2 deployinfo
+
+# This goes with something else above ... need to improve structure
+macx:mythinga.path = $$BUNDLE_PATH/Contents/Resources/settings
+}
 
 SOURCES += main.cpp \
     unitconvert.cpp \
@@ -216,7 +265,8 @@ HEADERS  += \
     unitsettingdialog.h \
     curvesettingdialog.h \
     ifixdialog.h \
-    sorputils.h
+    sorputils.h \
+    version.h
 
 FORMS    += \
     treedialog.ui \
