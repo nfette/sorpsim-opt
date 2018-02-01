@@ -1,10 +1,8 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#ifdef SORPVERSION
-const QString SORP_VERSION = SORPVERSION;
-#else
-const QString SORP_VERSION = "Custom build";
-#endif
+#include <QString>
+
+extern const QString SORP_VERSION;
 
 #endif // VERSION_H

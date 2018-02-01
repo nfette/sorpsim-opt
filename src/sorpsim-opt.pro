@@ -4,59 +4,77 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
-QT       += xml
-QT       += printsupport
-
-CONFIG   += qwt
-win32:CONFIG += console
-
-# Uncomment if you want to set this in here, otherwise set an environment variable
-#QWTPATH=/usr/local/qwt-6.1.3
-win32:INCLUDEPATH += $$(QWTPATH)/src
-win32:DEPENDPATH += $$(QWTPATH)/src
-#linux:INCLUDEPATH += $$(QWTPATH)/include
-#linux:DEPENDPATH += $$(QWTPATH)/include
-linux:INCLUDEPATH += /usr/include/qwt
-#macx:INCLUDEPATH += ${QWT_ROOT}/src
-
-win32:CONFIG(release, debug|release): LIBS += -L$$(QWTPATH)/lib/ -lqwt
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$(QWTPATH)/lib/ -lqwtd
-#else:linux: LIBS += -L$$(QWTPATH)/lib -lqwt
-else:linux: LIBS += -L/usr/lib -lqwt-qt5
-#else:macx {
-#    LIBS += -F${QWT_ROOT}/lib/ -framework qwt
-#}
-macx {
-    # include the qwt library for Mac compilation
-    # directory might be different for different machine settings
-    # set QWT_ROOT in your environment
-    include($$(QWT_ROOT)/features/qwt.prf)
-}
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
 # Usage: make
 # Then you get sorpsim-opt[.exe]
 TARGET = sorpsim-opt
 TEMPLATE = app
 
+QT       += core gui
+QT       += xml
+QT       += printsupport
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+# Cannot deploy with MSVC unless this ...
+CONFIG   += console
+
+#-----------------------------------------------
+# Configure qwt
+# You may need to set QWT_ROOT for your platform
+# (as environment variable, etc)
+#-----------------------------------------------
+CONFIG   += qwt
+win32{
+    # QWT_ROOT=\install\qwt-6.1.3
+    INCLUDEPATH += $$(QWT_ROOT)/src
+    DEPENDPATH += $$(QWT_ROOT)/src
+    CONFIG(release, debug|release): LIBS += -L$$(QWT_ROOT)/lib/ -lqwt
+    else:CONFIG(debug, debug|release): LIBS += -L$$(QWT_ROOT)/lib/ -lqwtd
+}
+else:linux{
+    QMAKE_CXXFLAGS += -std=c++11
+    # If you installed the package libqwt-qt-dev:
+    include($$[QT_INSTALL_ARCHDATA]/mkspecs/features/qwt.prf)
+    # Eg. look here: /usr/lib/$$system("arch")-linux-gnu/qt5/mkspecs/features/qwt.prf
+    # If above doesn't work, try this
+    # This works at build time, but on load, QtCreator might think it isn't found
+    # include(qwt.prf)
+    # Effectively same as
+    #INCLUDEPATH += /usr/include/qwt
+    #LIBS += -L/usr/lib -lqwt-qt5
+
+    # Else if you build your own qwt
+    # QWT_ROOT=/usr/local/qwt-6.1.3
+    #LIBS += -L$$(QWT_ROOT)/lib -lqwt
+    #INCLUDEPATH += $$(QWT_ROOT)/include
+    #DEPENDPATH += $$(QWT_ROOT)/include
+    # Else if you want all the variables defined in qwt features
+    #include($$(QWT_ROOT)/features/qwt.prf)
+}
+else:macx {
+    # If you just want to use the traditional method
+    #INCLUDEPATH += ${QWT_ROOT}/src
+    #LIBS += -F${QWT_ROOT}/lib/ -framework qwt
+
+    # Else if you want all the Or - include the qwt library for Mac compilation
+    # directory might be different for different machine settings
+    # set QWT_ROOT in your environment
+    include($$(QWT_ROOT)/features/qwt.prf)
+}
+
+
+
+
 #----------------------------------------------
 # Conveniences for building to debug and deploy
 #----------------------------------------------
 
-defineReplace(sorpVersion){
-    SORPVERSION = $$system("git describe --tags")
-    SORPVERSION_DEFINE = \\\"$$quote($$SORPVERSION)\\\"
-    message($$SORPVERSION_DEFINE)
-    export(SORPVERSION)
-    return($$SORPVERSION_DEFINE)
-}
+# Try to get the version from latest tag in git
+include(gitversion.pri)
+message(Version $$VERSION)
 
-DEFINES += SORPVERSION=$$sorpVersion()
-
-# https://stackoverflow.com/questions/3984104/qmake-how-to-copy-a-file-to-the-output
 # Copies the given files to the destination directory
+# https://stackoverflow.com/questions/3984104/qmake-how-to-copy-a-file-to-the-output
+# Used to install qwt binary for deployment (or other files as needed)
 defineReplace(copySafe){
     files = $$1
     DEST = $$2
@@ -201,7 +219,8 @@ SOURCES += main.cpp \
     curvesettingdialog.cpp \
     editpropertycurvedialog.cpp \
     ifixdialog.cpp \
-    sorputils.cpp
+    sorputils.cpp \
+    version.cpp
 
 HEADERS  += \
     unitconvert.h \

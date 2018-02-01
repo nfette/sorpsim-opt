@@ -21,9 +21,8 @@ choice, then run the executable (sorpsim-opt).
 
 ## Linux
 
-If you use Linux, I'm expecting you to build it yourself. On Ubuntu you can get the prerequisites:
-* apt install libqwt-qt5 qtbase5-dev
-
+If you use Linux, I'm expecting you to build it yourself. On Ubuntu you can get the prerequisites this way:
+* apt install libqwt-qt5-dev qtbase5-dev libqt5svg5-dev
 
 # Building
 
