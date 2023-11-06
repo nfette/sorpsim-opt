@@ -14,6 +14,9 @@
 
 */
 
+#include <QDebug>
+#include <QKeyEvent>
+#include <QMessageBox>
 
 #include "editpropertycurvedialog.h"
 #include "ui_editpropertycurvedialog.h"
@@ -22,12 +25,7 @@
 #include "dataComm.h"
 #include "unitconvert.h"
 #include "unit.h"
-#include "node.h"
 #include "sorputils.h"
-#include <QMessageBox>
-#include <QKeyEvent>
-#include <QDebug>
-
 
 extern globalparameter globalpara;
 extern unit * dummy;
@@ -119,50 +117,39 @@ editPropertyCurveDialog::editPropertyCurveDialog(Plot*d_plot, QList<QwtPlotCurve
         globalpara.reportError("Fail to open case file for overlay setting.",this);
         return;
     }
-    else
+    if(!doc.setContent(&file))
     {
-        if(!doc.setContent(&file))
-        {
-            globalpara.reportError("Fail to load xml document for overlay setting.",this);
-            file.close();
-            return;
-        }
-        else
-        {
-            plotData = doc.elementsByTagName("plotData").at(0).toElement();
-
-            // FIXED: make <plotData> children have valid XML tag names etc.
-            // (See comments elsewhere in code)
-            //currentPlot = plotData.elementsByTagName(overlay_plot->title().text().replace(" ","")).at(0).toElement();
-            QString plotTitle = overlay_plot->title().text();
-            QMap<QString, QDomElement> plotsByTitle;
-            QDomNodeList plots = plotData.elementsByTagName("plot");
-            for (int i = 0; i < plots.length(); i++)
-            {
-                QDomElement node = plots.at(i).toElement();
-                QString nodeTitle = node.attribute("title");
-                plotsByTitle.insert(nodeTitle, node);
-            }
-            if (!plotsByTitle.contains(plotTitle))
-            {
-                qDebug()<<"No <plot> with given title found in XML <plotData>.";
-                file.close();
-                return;
-            }
-            currentPlot = plotsByTitle.value(plotTitle);
-            if(currentPlot.attribute("plotType")!="property")
-            {
-                qDebug()<<"wrong plot type";
-                file.close();
-                return;
-            }
-            else
-            {
-                plotUnit = currentPlot.attribute("unitSystem");
-            }
-        }
+        globalpara.reportError("Fail to load xml document for overlay setting.",this);
+        file.close();
+        return;
     }
-
+    plotData = doc.elementsByTagName("plotData").at(0).toElement();
+    // FIXED: make <plotData> children have valid XML tag names etc.
+    // (See comments elsewhere in code)
+    //currentPlot = plotData.elementsByTagName(overlay_plot->title().text().replace(" ","")).at(0).toElement();
+    QString plotTitle = overlay_plot->title().text();
+    QMap<QString, QDomElement> plotsByTitle;
+    QDomNodeList plots = plotData.elementsByTagName("plot");
+    for (int i = 0; i < plots.length(); i++)
+    {
+        QDomElement node = plots.at(i).toElement();
+        QString nodeTitle = node.attribute("title");
+        plotsByTitle.insert(nodeTitle, node);
+    }
+    if (!plotsByTitle.contains(plotTitle))
+    {
+        qDebug()<<"No <plot> with given title found in XML <plotData>.";
+        file.close();
+        return;
+    }
+    currentPlot = plotsByTitle.value(plotTitle);
+    if(currentPlot.attribute("plotType")!="property")
+    {
+        qDebug()<<"wrong plot type";
+        file.close();
+        return;
+    }
+    plotUnit = currentPlot.attribute("unitSystem");
     updateLoopList();
     loadCurrentCurve();
 }
@@ -176,43 +163,27 @@ void editPropertyCurveDialog::displayList()
 {
     ui->spList->clear();
     for (int j=0;j<overlay_plot->addvaluelist.count();j++)
-    {
         ui->spList->addItem(QString::number(overlay_plot->addvaluelist.at(j).index));
-    }
-
 }
 
 void editPropertyCurveDialog::on_moveUpButton_clicked()
 {
     if (ui->spList->currentRow()==0||ui->spList->currentRow()<0)
-    {
         return;
-    }
-    else
-    {
-        int temp=ui->spList->currentRow();
-        overlay_plot->addvaluelist.move(temp,temp-1);
-        displayList();
-        ui->spList->setCurrentRow(temp-1);
-    }
-
-
+    int temp=ui->spList->currentRow();
+    overlay_plot->addvaluelist.move(temp,temp-1);
+    displayList();
+    ui->spList->setCurrentRow(temp-1);
 }
 
 void editPropertyCurveDialog::on_moveDownButton_clicked()
 {
     if (ui->spList->currentRow()==(ui->spList->count()-1)||ui->spList->currentRow()<0)
-    {
         return;
-    }
-    else
-    {
-        int temp=ui->spList->currentRow();
-        overlay_plot->addvaluelist.move(temp,temp+1);
-        displayList();
-        ui->spList->setCurrentRow(temp+1);
-    }
-
+    int temp=ui->spList->currentRow();
+    overlay_plot->addvaluelist.move(temp,temp+1);
+    displayList();
+    ui->spList->setCurrentRow(temp+1);
 }
 
 void editPropertyCurveDialog::on_removeButton_clicked()
@@ -224,7 +195,6 @@ void editPropertyCurveDialog::on_removeButton_clicked()
         displayList();
         ui->spList->setCurrentRow(temp);
     }
-
 }
 
 void editPropertyCurveDialog::on_seleCycleButton_clicked()
@@ -256,8 +226,7 @@ void editPropertyCurveDialog::on_seleIndexButton_clicked()
         globalpara.reportError("State Point index provided is out of range!");
         return;
     }
-    else addSP(ui->spIndexLE->text().toInt());
-
+    addSP(ui->spIndexLE->text().toInt());
     ui->spIndexLE->clear();
 }
 
@@ -633,161 +602,140 @@ void editPropertyCurveDialog::updateXml()
             globalpara.reportError("Fail to open case file for overlay setting.",this);
             return;
         }
-        else
+        if(!doc.setContent(&file))
         {
-            if(!doc.setContent(&file))
-            {
-                globalpara.reportError("Fail to load xml document for overlay setting.",this);
-                file.close();
-                return;
-            }
-            else
-            {
-                // <plotData>
-                plotData = doc.elementsByTagName("plotData").at(0).toElement();
-
-                // FIXED: valid XML for children of <plotData>
-                //currentPlot = plotData.elementsByTagName(overlay_plot->title().text()).at(0).toElement();
-                QString plotTitle = overlay_plot->title().text();
-                QMap<QString, QDomElement> plotsByTitle;
-                QDomNodeList plots = plotData.elementsByTagName("plot");
-                for (int i = 0; i < plots.length(); i++)
-                {
-                    QDomElement node = plots.at(i).toElement();
-                    QString nodeTitle = node.attribute("title");
-                    plotsByTitle.insert(nodeTitle, node);
-                }
-                if (!plotsByTitle.contains(plotTitle))
-                {
-                    qDebug()<<"No <plot> with given title found in XML <plotData>.";
-                    file.close();
-                    return;
-                }
-                currentPlot = plotsByTitle.value(plotTitle);
-
-                if(currentPlot.attribute("plotType")!="property")
-                {
-                    qDebug()<<"wrong plot type";
-                    file.close();
-                    return;
-                }
-                QMap<QString, QDomElement> curvesByTitle;
-                QDomNodeList curves = currentPlot.elementsByTagName("curveList").at(0).toElement().elementsByTagName("curve");
-                for (int i = 0; i < curves.length(); i++)
-                {
-                    QDomElement node = curves.at(i).toElement();
-                    QString nodeTitle = node.attribute("title");
-                    curvesByTitle.insert(nodeTitle, node);
-                }
-                if (!curvesByTitle.contains(curveName))
-                {
-                    qDebug()<<"error! old curve node doesn't exist.";
-                    qDebug()<<"No <curve> with given title found in XML <curveList>.";
-                    file.close();
-                    return;
-                }
-
-                thisCurve = curvesByTitle.value(curveName);
-                addvalue value;
-                for(int i = 0; i < overlay_plot->addvaluelist.count();i++)
-                {
-                    currentPoint = doc.createElement("point"+QString::number(i));
-                    currentPoint.setAttribute("order",QString::number(i));
-                    value = overlay_plot->addvaluelist.at(i);
-                    currentPoint.setAttribute("index",QString::number(value.index));
-                    currentPoint.setAttribute("t",QString::number(value.add_temperature));
-                    currentPoint.setAttribute("p",QString::number(value.add_pressure));
-                    currentPoint.setAttribute("c",QString::number(value.add_concentration));
-                    currentPoint.setAttribute("h",QString::number(value.add_enthalpy));
-                    thisCurve.appendChild(currentPoint);
-                    thePoints.append(QString::number(value.index));
-                }
-//                currentPlot.appendChild(thisCurve);
-//                overlay_plot->curvePoints.append(thePoints);
-
-                file.resize(0);
-                doc.save(stream,4);
-                file.close();
-                return;
-
-            }
+            globalpara.reportError("Fail to load xml document for overlay setting.",this);
+            file.close();
+            return;
+        }
+        // <plotData>
+        plotData = doc.elementsByTagName("plotData").at(0).toElement();
+        // FIXED: valid XML for children of <plotData>
+        //currentPlot = plotData.elementsByTagName(overlay_plot->title().text()).at(0).toElement();
+        QString plotTitle = overlay_plot->title().text();
+        QMap<QString, QDomElement> plotsByTitle;
+        QDomNodeList plots = plotData.elementsByTagName("plot");
+        for (int i = 0; i < plots.length(); i++)
+        {
+            QDomElement node = plots.at(i).toElement();
+            QString nodeTitle = node.attribute("title");
+            plotsByTitle.insert(nodeTitle, node);
+        }
+        if (!plotsByTitle.contains(plotTitle))
+        {
+            qDebug()<<"No <plot> with given title found in XML <plotData>.";
+            file.close();
+            return;
+        }
+        currentPlot = plotsByTitle.value(plotTitle);
+        if(currentPlot.attribute("plotType")!="property")
+        {
+            qDebug()<<"wrong plot type";
+            file.close();
+            return;
+        }
+        QMap<QString, QDomElement> curvesByTitle;
+        QDomNodeList curves = currentPlot.elementsByTagName("curveList").at(0).toElement().elementsByTagName("curve");
+        for (int i = 0; i < curves.length(); i++)
+        {
+            QDomElement node = curves.at(i).toElement();
+            QString nodeTitle = node.attribute("title");
+            curvesByTitle.insert(nodeTitle, node);
+        }
+        if (!curvesByTitle.contains(curveName))
+        {
+            qDebug()<<"error! old curve node doesn't exist.";
+            qDebug()<<"No <curve> with given title found in XML <curveList>.";
+            file.close();
+            return;
         }
 
+        thisCurve = curvesByTitle.value(curveName);
+        addvalue value;
+        for(int i = 0; i < overlay_plot->addvaluelist.count();i++)
+        {
+            currentPoint = doc.createElement("point"+QString::number(i));
+            currentPoint.setAttribute("order",QString::number(i));
+            value = overlay_plot->addvaluelist.at(i);
+            currentPoint.setAttribute("index",QString::number(value.index));
+            currentPoint.setAttribute("t",QString::number(value.add_temperature));
+            currentPoint.setAttribute("p",QString::number(value.add_pressure));
+            currentPoint.setAttribute("c",QString::number(value.add_concentration));
+            currentPoint.setAttribute("h",QString::number(value.add_enthalpy));
+            thisCurve.appendChild(currentPoint);
+            thePoints.append(QString::number(value.index));
+        }
+//      currentPlot.appendChild(thisCurve);
+//      overlay_plot->curvePoints.append(thePoints);
+
+        file.resize(0);
+        doc.save(stream,4);
+        file.close();
     }
 }
 
 void editPropertyCurveDialog::removeOld()
 {
-// TODO: fix indentation
-            QFile file(Sorputils::sorpTempDir().absoluteFilePath("plotTemp.xml"));
-            QTextStream stream;
-            stream.setDevice(&file);
-            QDomDocument doc;
-            QDomElement plotData, currentPlot;
+    QFile file(Sorputils::sorpTempDir().absoluteFilePath("plotTemp.xml"));
+    QTextStream stream;
+    stream.setDevice(&file);
+    QDomDocument doc;
+    QDomElement plotData, currentPlot;
 
-            if(!file.open(QIODevice::ReadWrite | QIODevice::Text))
-            {
-                globalpara.reportError("Fail to open case file for overlay setting.",this);
-                return;
-            }
-            else
-            {
-                if(!doc.setContent(&file))
-                {
-                    globalpara.reportError("Fail to load xml document for overlay setting.",this);
-                    file.close();
-                    return;
-                }
-                else
-                {
-                    // <plotData>
-                    plotData = doc.elementsByTagName("plotData").at(0).toElement();
+    if(!file.open(QIODevice::ReadWrite | QIODevice::Text))
+    {
+        globalpara.reportError("Fail to open case file for overlay setting.",this);
+        return;
+    }
+    if(!doc.setContent(&file))
+    {
+        globalpara.reportError("Fail to load xml document for overlay setting.",this);
+        file.close();
+        return;
+    }
+    // <plotData>
+    plotData = doc.elementsByTagName("plotData").at(0).toElement();
 
-                    // FIXED: produces valid XML.
-                    // TODO: merge with some other property dialog in here (nearly identical)
-                    //currentPlot = plotData.elementsByTagName(overlay_plot->title().text()).at(0).toElement();
-                    QString plotTitle = overlay_plot->title().text();
-                    QMap<QString, QDomElement> plotsByTitle;
-                    QDomNodeList plots = plotData.elementsByTagName("plot");
-                    for (int i = 0; i < plots.length(); i++)
-                    {
-                        QDomElement node = plots.at(i).toElement();
-                        QString nodeTitle = node.attribute("title");
-                        plotsByTitle.insert(nodeTitle, node);
-                    }
-                    if (!plotsByTitle.contains(plotTitle))
-                    {
-                        qDebug()<<"No <plot> with given title found in XML <plotData>.";
-                        file.close();
-                        return;
-                    }
-                    currentPlot = plotsByTitle.value(plotTitle);
+    // FIXED: produces valid XML.
+    // TODO: merge with some other property dialog in here (nearly identical)
+    //currentPlot = plotData.elementsByTagName(overlay_plot->title().text()).at(0).toElement();
+    QString plotTitle = overlay_plot->title().text();
+    QMap<QString, QDomElement> plotsByTitle;
+    QDomNodeList plots = plotData.elementsByTagName("plot");
+    for (int i = 0; i < plots.length(); i++)
+    {
+        QDomElement node = plots.at(i).toElement();
+        QString nodeTitle = node.attribute("title");
+        plotsByTitle.insert(nodeTitle, node);
+    }
+    if (!plotsByTitle.contains(plotTitle))
+    {
+        qDebug()<<"No <plot> with given title found in XML <plotData>.";
+        file.close();
+        return;
+    }
+    currentPlot = plotsByTitle.value(plotTitle);
 
-                    QMap<QString, QDomElement> curvesByTitle;
-                    QDomNodeList curves = currentPlot.elementsByTagName("curveList").at(0).toElement().elementsByTagName("curve");
-                    for (int i = 0; i < curves.length(); i++)
-                    {
-                        QDomElement node = curves.at(i).toElement();
-                        QString nodeTitle = node.attribute("title");
-                        plotsByTitle.insert(nodeTitle, node);
-                    }
-                    if (!curvesByTitle.contains(curveName))
-                    {
-                        qDebug()<<"No <curve> with given title found in XML <curveList>.";
-                        file.close();
-                        return;
-                    }
-                    QDomNode oldCurveNode = curvesByTitle.value(curveName);
+    QMap<QString, QDomElement> curvesByTitle;
+    QDomNodeList curves = currentPlot.elementsByTagName("curveList").at(0).toElement().elementsByTagName("curve");
+    for (int i = 0; i < curves.length(); i++)
+    {
+        QDomElement node = curves.at(i).toElement();
+        QString nodeTitle = node.attribute("title");
+        plotsByTitle.insert(nodeTitle, node);
+    }
+    if (!curvesByTitle.contains(curveName))
+    {
+        qDebug()<<"No <curve> with given title found in XML <curveList>.";
+        file.close();
+        return;
+    }
+    QDomNode oldCurveNode = curvesByTitle.value(curveName);
+    while(oldCurveNode.childNodes().count() > 0)
+        oldCurveNode.removeChild(oldCurveNode.childNodes().at(0));
 
-                    while(oldCurveNode.childNodes().count()>0){
-                        oldCurveNode.removeChild(oldCurveNode.childNodes().at(0));
-                    }
-
-                    file.resize(0);
-                    doc.save(stream,4);
-                    file.close();
-                    stream.flush();
-                }
-            }
-
+    file.resize(0);
+    doc.save(stream,4);
+    file.close();
+    stream.flush();
 }
