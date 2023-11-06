@@ -16,7 +16,6 @@
 #include "myview.h"
 #include "mainwindow.h"
 #include "unit.h"
-#include "node.h"
 #include <QWheelEvent>
 #include <QDebug>
 #include <math.h>
@@ -34,32 +33,38 @@ myView::myView(QWidget *parent)
 
 void myView::wheelEvent(QWheelEvent *event)
 {
-    if (event->delta() >0&&myScale<2.5)
+    int delta = event->angleDelta().y();
+    if (delta > 0 && myScale < 2.5)
     {
         this->scale(1.12,1.12);
         myScale = myScale*1.12;
     }
-    if(event->delta()<0&&myScale>0.7)
+    if (delta < 0 && myScale > 0.7)
     {
         this->scale(0.89,0.89);
         myScale = myScale*0.89;
     }
     setScale();
-
 }
 
 void myView::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key()==Qt::Key_Left)
-        moveLeft();
-    else if(event->key()==Qt::Key_Right)
-        moveRight();
-    else if(event->key()==Qt::Key_Up)
-        moveUp();
-    else if(event->key()==Qt::Key_Down)
-        moveDown();
-    else
+    switch (event->key()) {
+    case Qt::Key_Left:
+        moveBy(-10, 0);
+        break;
+    case Qt::Key_Right:
+        moveBy(10, 0);
+        break;
+    case Qt::Key_Up:
+        moveBy(0, -10);
+        break;
+    case Qt::Key_Down:
+        moveBy(0, 10);
+        break;
+    default:
         QGraphicsView::keyPressEvent(event);
+    }
 }
 
 void myView::setScale()
@@ -81,50 +86,14 @@ void myView::setScale()
     }
 }
 
-void myView::moveLeft()
+void myView::moveBy(int x, int y)
 {
-    if(!theScene->selectedItems().isEmpty())
-    {
-        if(theScene->selectedItems().first()->zValue()==2)
-        {
-            QGraphicsRectItem* rect = dynamic_cast<QGraphicsRectItem*>(theScene->selectedItems().first());
-            rect->moveBy(-10,0);
-        }
-    }
-}
+    if (theScene->selectedItems().isEmpty())
+        return;
 
-void myView::moveRight()
-{
-    if(!theScene->selectedItems().isEmpty())
+    if(theScene->selectedItems().first()->zValue()==2)
     {
-        if(theScene->selectedItems().first()->zValue()==2)
-        {
-            QGraphicsRectItem* rect = dynamic_cast<QGraphicsRectItem*>(theScene->selectedItems().first());
-            rect->moveBy(10,0);
-        }
-    }
-}
-
-void myView::moveUp()
-{
-    if(!theScene->selectedItems().isEmpty())
-    {
-        if(theScene->selectedItems().first()->zValue()==2)
-        {
-            QGraphicsRectItem* rect = dynamic_cast<QGraphicsRectItem*>(theScene->selectedItems().first());
-            rect->moveBy(0,-10);
-        }
-    }
-}
-
-void myView::moveDown()
-{
-    if(!theScene->selectedItems().isEmpty())
-    {
-        if(theScene->selectedItems().first()->zValue()==2)
-        {
-            QGraphicsRectItem* rect = dynamic_cast<QGraphicsRectItem*>(theScene->selectedItems().first());
-            rect->moveBy(0,10);
-        }
+        QGraphicsRectItem* rect = dynamic_cast<QGraphicsRectItem*>(theScene->selectedItems().first());
+        rect->moveBy(x, y);
     }
 }

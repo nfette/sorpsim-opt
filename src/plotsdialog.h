@@ -72,7 +72,7 @@ private slots:
 
     void enableZoomMode(bool on);
 
-    void showInfo( QString text = QString::null );
+    void showInfo( QString text = QString() );
 
     void deleteCurrentPlot();
 

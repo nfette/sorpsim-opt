@@ -217,7 +217,7 @@ void Node::mergeInsidePoint(Node *insidePoint, Node *outPoint)
 
                 if(tempNode->linked&&tempNode->linklowerflag)
                 {
-                    Link*linktemp = tempNode->myLinks.toList().at(0);
+                    Link*linktemp = tempNode->myLinks.values().first();
                     Node*node1,*node2 = tempNode;
                     node1 = linktemp->myFromNode;
                     if(node1==node2)
@@ -299,7 +299,7 @@ void Node::demergeInsidePoint(Node *insidePoint, Node *outPoint)
                 Node*tempNode = head->myNodes[j];
                 if(tempNode->linked&&tempNode->linklowerflag)
                 {
-                    Link*linktemp = tempNode->myLinks.toList().first();
+                    Link*linktemp = tempNode->myLinks.values().first();
                     Node* node1 = linktemp->myFromNode;
                     if(node1==tempNode)
                         node1=linktemp->myToNode;
@@ -538,7 +538,7 @@ bool Node::searchAllSet(QString type,bool searchCloseLoop)
 
 bool Node::addLinkedSet(Node *thisNode, QString type, bool searchCloseLoop, Node *startNode)
 {
-    Link * link = thisNode->myLinks.toList().at(0);
+    Link * link = thisNode->myLinks.values().first();
     Node* otherNode=link->myToNode;
     if(link->myToNode==thisNode)
         otherNode = link->myFromNode;
@@ -653,10 +653,10 @@ bool Node::addLinkedSet(Node *thisNode, QString type, bool searchCloseLoop, Node
 QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 {
 
-    if (change== ItemScenePositionHasChanged && (!myLinks.isEmpty()))
+    if (change == ItemScenePositionHasChanged && (!myLinks.isEmpty()))
     {
-        Link * link = myLinks.toList().first();
-            link->trackNodes();
+        Link * link = myLinks.values().first();
+        link->trackNodes();
     }
     return QGraphicsItem::itemChange(change,value);
 }

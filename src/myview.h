@@ -30,17 +30,13 @@ public:
 signals:
 
 public slots:
-
     void wheelEvent(QWheelEvent *event);
     void keyPressEvent(QKeyEvent *event);
     double myScale;
     void setScale();
 
 private slots:
-    void moveLeft();
-    void moveRight();
-    void moveUp();
-    void moveDown();
+    void moveBy(int x, int y);
 };
 
 #endif // MYVIEW_H

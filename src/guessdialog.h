@@ -49,9 +49,7 @@ private:
     void adjustTableSize();
     void showEvent(QShowEvent *e);
 
-
     bool fromMDialog;
-    QByteArray myByteArray;
     QStringList selected;
 };
 

@@ -13,17 +13,16 @@
     \copyright 2017-2018, Nicholas Fette
 */
 
-
+#include <QDebug>
+#include <QDoubleValidator>
+#include <QMessageBox>
+#include <QLayout>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
+#include <QValidator>
+#include "mainwindow.h"
 #include "altervdialog.h"
 #include "ui_altervdialog.h"
-#include "tabledialog.h"
-#include <QMessageBox>
-#include <QDoubleValidator>
-#include <QDebug>
-#include <QLayout>
-#include <QValidator>
-#include <QDoubleValidator>
-#include "mainwindow.h"
 
 extern bool alvIsEnter;
 extern int alvFirstRow;
@@ -35,9 +34,7 @@ extern int alvMethod;
 extern int alvCol;
 extern int alvRowCount;
 
-extern MainWindow*theMainwindow;
-
-
+extern MainWindow *theMainwindow;
 
 altervDialog::altervDialog(QWidget *parent) :
     QDialog(parent),
@@ -51,8 +48,7 @@ altervDialog::altervDialog(QWidget *parent) :
     ui->firstValueLE->setText(QString::number(0));
     ui->lastValueLE->setText(QString::number(0));
 
-    QRegExp regExp("[-.0-9]+$");
-    QRegExpValidator *regExpValidator = new QRegExpValidator(regExp,this);
+    QRegularExpressionValidator *regExpValidator = new QRegularExpressionValidator(QRegularExpression("[-.0-9]+$"), this);
     ui->firstValueLE->setValidator(regExpValidator);
     ui->lastValueLE->setValidator(regExpValidator);
 
@@ -60,7 +56,6 @@ altervDialog::altervDialog(QWidget *parent) :
     setWindowModality(Qt::WindowModal);
     QLayout *mainLayout = layout();
     mainLayout->setSizeConstraint(QLayout::SetFixedSize);
-
 }
 
 altervDialog::~altervDialog()

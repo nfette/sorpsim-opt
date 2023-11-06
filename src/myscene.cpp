@@ -398,7 +398,7 @@ void myScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
                                     node->ksub=fluidSetting;
                                     if(node->linked)
                                     {
-                                        Link* link = node->myLinks.toList().at(0);
+                                        Link* link = node->myLinks.values().first();
                                         link->myFromNode->ksub = fluidSetting;
                                         link->myToNode->ksub = fluidSetting;
                                         link->setColor();
@@ -559,7 +559,7 @@ int myScene::checkFluidForLink(Node *node1, Node *node2)
                     sps.append("sp"+QString::number(node->ndum));
                 if(node->linked)
                 {
-                    Link* link = node->myLinks.toList().at(0);
+                    Link* link = node->myLinks.values().first();
                     if(!sps.contains("sp"+QString::number(link->myFromNode->ndum)))
                         sps.append("sp"+QString::number(link->myFromNode->ndum));
                     if(!sps.contains("sp"+QString::number(link->myToNode->ndum)))
@@ -652,7 +652,7 @@ void myScene::drawLink(Node *node1, Node *node2)
                         if(head->myNodes[j-1]->linked && head->myNodes[j-1]->linklowerflag)//linked and is the larger one, update according to the smaller one
                         {
                             Link * linktemp;
-                            linktemp = head->myNodes[j-1]->myLinks.toList().first();
+                            linktemp = head->myNodes[j-1]->myLinks.values().first();
                             Node * sp3 = linktemp->myFromNode;
                             Node * sp4 = linktemp->myToNode;
                             if(sp3->unitindex > sp4->unitindex)
@@ -690,7 +690,7 @@ void myScene::drawLink(Node *node1, Node *node2)
                         else if(head->myNodes[intTemp]->linked && head->myNodes[intTemp]->linklowerflag)//linked and is the larger one, update according to the smaller one
                         {
                             Link * linktemp;
-                            linktemp = head->myNodes[intTemp]->myLinks.toList().first();
+                            linktemp = head->myNodes[intTemp]->myLinks.values().first();
                             Node * sp3 = linktemp->myFromNode;
                             Node * sp4 = linktemp->myToNode;
                             if(sp3->unitindex > sp4->unitindex)

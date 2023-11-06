@@ -13,7 +13,6 @@
 
 */
 
-
 #include "newparaplotdialog.h"
 #include "ui_newparaplotdialog.h"
 #include <QFile>
@@ -79,8 +78,8 @@ void newParaPlotDialog::on_okButton_clicked()
         if(mode<2)
         {
             // TODO: don't need to replace
-            plotName = ui->plotNameLine->text().replace(QRegExp("[^a-zA-Z0-9_]"), "");
-            if(plotName.count()==0)
+            plotName = ui->plotNameLine->text().replace(QRegularExpression("[^a-zA-Z0-9_]"), "");
+            if(plotName.isEmpty())
             {
                 for(int i = 1;plotNameUsed(plotName);i++)
                     plotName = "plot_"+QString::number(i);

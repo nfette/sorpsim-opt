@@ -13,32 +13,27 @@
 
 */
 
-
-
-
+#include <QApplication>
+#include <QDebug>
+#include <QLabel>
+#include <QPixmap>
+#include <QString>
+#include <QToolBar>
+#include <QToolButton>
 #include <plotproperty.h>
-#include <qapplication.h>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
 #include <qwt_symbol.h>
 #include <qwt_legend.h>
-#include <qstring.h>
-#include <QString>
-#include <QDebug>
 #include <qwt_scale_engine.h>
 #include <qwt_picker_machine.h>
-#include <qtoolbar.h>
-#include <qtoolbutton.h>
 #include <qwt_counter.h>
 #include <qwt_plot_marker.h>
 #include <qwt_symbol.h>
-#include <QPixmap>
-#include <QLabel>
 #include <qwt_scale_map.h>
 #include <overlaysettingdialog.h>
 #include "dataComm.h"
-
 
 extern globalparameter globalpara;
 
@@ -94,7 +89,7 @@ Plot::Plot(QString fluid, QString subType, QString unitSystem)
     internalLegend->setSpacing( 4 );
     internalLegend->setItemMargin( 2 );
     internalLegend->setMaxColumns(4);
-    internalLegend->setAlignment(Qt::AlignBottom|Qt::AlignRight);
+    internalLegend->setAlignmentInCanvas(Qt::AlignBottom|Qt::AlignRight);
     internalLegend->setVisible(false);
     externalLegend=NULL;
 
@@ -687,7 +682,7 @@ Plot::Plot(QMultiMap<double, double> data, QStringList xValues, int curveCount, 
     internalLegend->setSpacing( 4 );
     internalLegend->setItemMargin( 2 );
     internalLegend->setMaxColumns(4);
-    internalLegend->setAlignment(Qt::AlignBottom|Qt::AlignRight);
+    internalLegend->setAlignmentInCanvas(Qt::AlignBottom|Qt::AlignRight);
     internalLegend->setVisible(false);
     externalLegend=NULL;
     grid = new QwtPlotGrid();

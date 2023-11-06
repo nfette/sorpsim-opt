@@ -5931,10 +5931,10 @@ void
 qheat(
   common& cmn,
   int const& iunit,
-        int i1,
-        int i2,
-        int i3,
-        int i4,
+  int i1,
+  int i2,
+  int i3,
+  int i4,
   double const& t1,
   double const& t2,
   double const& t3,
@@ -6000,11 +6000,6 @@ qheat(
   double crmin = fem::float0;
   double crm = fem::float0;
   double tr3 = fem::float0;
-  QString sp1,sp2,sp3,sp4,eName;
-  sp1 = i1;
-  sp2 = i2;
-  sp3 = i3;
-  sp4 = i4;
   //C*********************************************************************
   //C      IMPLICIT REAL*8(A-H,O-Z)
   //C*********************************************************************
@@ -6028,9 +6023,7 @@ qheat(
   fun(nnl) = (qqp + qqn) / fcpt;//energy balance
   unit*iterator = dummy->next;
   for(int i = 0;i<globalcount&&iterator->nu!=iunit;i++)
-  {
-      iterator = iterator->next;
-  }
+    iterator = iterator->next;
   // TODO: make this consistent with other parts of code
   outputs.equations.append("Energy balance in "+iterator->unitName);
   afun(nnl) = "Heat Balance";

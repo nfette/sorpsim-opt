@@ -289,7 +289,7 @@ bool globalparameter::findNextPtxPoint(Node *thisNode, Node *StartingNode)
             Node*outNode = thisNode;
             if(thisNode->isOutlet)
             {
-                Link*theLink = thisNode->myLinks.toList().first();
+                Link*theLink = thisNode->myLinks.values().first();
                 outNode = theLink->myFromNode;
                 if(outNode->isOutlet)
                     outNode = theLink->myToNode;
@@ -306,7 +306,6 @@ bool globalparameter::findNextPtxPoint(Node *thisNode, Node *StartingNode)
 
 //            qDebug()<<"starting from "<<thisNode->ndum;
         }
-
 
         if(!ptxStream.contains(thisNode->ndum))
             ptxStream.append(thisNode->ndum);
@@ -335,7 +334,6 @@ bool globalparameter::findNextPtxPoint(Node *thisNode, Node *StartingNode)
                 }
             }
         }
-
 
         ///if point is linked, go to next point, if loop close in that one, stop searching through
         ///this component and return true; if loop doesn't close in that one, go on searching
@@ -374,7 +372,7 @@ bool globalparameter::findNextPtxPoint(Node *thisNode, Node *StartingNode)
                 {
                     if(node->linked)
                     {
-                        Link*theLink = node->myLinks.toList().at(0);
+                        Link*theLink = node->myLinks.values().first();
                         Node*otherNode = theLink->myToNode;
                         if(node==theLink->myToNode)
                             otherNode = theLink->myFromNode;
@@ -394,8 +392,6 @@ bool globalparameter::findNextPtxPoint(Node *thisNode, Node *StartingNode)
         //then return false.
         return false;
     }
-
-
 }
 
 void globalparameter::removeRecentFile(QString delFileName)

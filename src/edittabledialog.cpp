@@ -14,23 +14,20 @@
 
 */
 
+#include <QDebug>
+#include <QLabel>
+#include <QLayout>
+#include <QListView>
+#include <QStringList>
+#include <QStatusBar>
 
 #include "edittabledialog.h"
 #include "ui_edittabledialog.h"
 #include "mainwindow.h"
-#include "tabledialog.h"
 #include "dataComm.h"
 #include "myscene.h"
 #include "unit.h"
-#include "node.h"
 #include "sorputils.h"
-
-#include <QStringList>
-#include <QListView>
-#include <QDebug>
-#include <QLabel>
-#include <QLayout>
-#include <QStatusBar>
 
 extern int sceneActionIndex;
 extern bool istableinput;
@@ -48,7 +45,6 @@ QStringList outputQ;
 QStringList inputR;
 QStringList outputR;
 extern MainWindow*theMainwindow;
-
 
 editTableDialog::editTableDialog(QString theTableName, QWidget *parent) :
     QDialog(parent),
@@ -239,8 +235,8 @@ void editTableDialog::on_OKButton_clicked()
         globalpara.reportError("Please specify at least one input and one output.",this);
     else
     {
-        tableName = ui->tableNameLE->text().replace(QRegExp("[^a-zA-Z0-9_]"), "");
-        if(tableName.count()==0)
+        tableName = ui->tableNameLE->text().replace(QRegularExpression("[^a-zA-Z0-9_]"), "");
+        if(tableName.isEmpty())
         {
             for(int i = 1;tableNameUsed(tableName);i++)
                 tableName = "table_"+QString::number(i);

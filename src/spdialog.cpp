@@ -13,22 +13,22 @@
 
 */
 
+#include <QComboBox>
+#include <QDebug>
+#include <QDoubleValidator>
+#include <QLayout>
+#include <QList>
+#include <QMessageBox>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
+#include <QSet>
+#include <QValidator>
 
 #include "spdialog.h"
 #include "ui_spdialog.h"
-#include "node.h"
-#include "myscene.h"
 #include "link.h"
-#include <QMessageBox>
-#include <QDebug>
 #include "mainwindow.h"
 #include "dataComm.h"
-#include <QSet>
-#include <QComboBox>
-#include <QList>
-#include <QLayout>
-#include <QValidator>
-#include <QDoubleValidator>
 
 extern globalparameter globalpara;
 extern unit* dummy;
@@ -58,8 +58,6 @@ spDialog::spDialog(Node* sp, QWidget *parent) :
     ui->fUnit->setText(globalpara.unitname_massflow);
     ui->cUnit->setText(globalpara.unitname_concentration);
     ui->wUnit->setText("");
-
-
 
     switch(myNode->myUnit->idunit)
     {
@@ -144,28 +142,22 @@ spDialog::spDialog(Node* sp, QWidget *parent) :
 
     updateSetting();
 
-
 //    setWindowFlags(Qt::WindowTitleHint|Qt::WindowMinimizeButtonHint);
-
 
     QLayout *mainLayout = layout();
     mainLayout->setSizeConstraint(QLayout::SetFixedSize);
 
     initializing = false;
 
-
     QValidator *inputRange = new QDoubleValidator(0,100,4,this);
     QValidator *inputRange1 = new QDoubleValidator(0,1,4,this);
 
-    QRegExp regExp("[-.0-9]+$");
-    QRegExpValidator *regExpValidator = new QRegExpValidator(regExp,this);
-
+    QRegularExpressionValidator *regExpValidator = new QRegularExpressionValidator(QRegularExpression("[-.0-9]+$"), this);
     ui->TLE->setValidator(regExpValidator);
     ui->PLE->setValidator(regExpValidator);
     ui->CLE->setValidator(inputRange);
     ui->FLE->setValidator(regExpValidator);
     ui->WLE->setValidator(inputRange1);
-
 }
 
 spDialog::~spDialog()
@@ -193,7 +185,6 @@ void spDialog::on_OkButton_clicked()
         if(ui->WFButton->isChecked()&&ui->WLE->text().isEmpty())
                 completed = false;
 
-
         if(!completed)
         {
             QMessageBox::warning(this, "Warning", "Please enter value for input parameter(s)");
@@ -218,7 +209,7 @@ void spDialog::on_OkButton_clicked()
                 node->ksub = myNode->ksub;
                 if(node->linked)
                 {
-                    Link* link = node->myLinks.toList().at(0);
+                    Link* link = node->myLinks.values().first();
                     link->myFromNode->ksub = myNode->ksub;
                     link->setColor();
                 }
@@ -583,7 +574,7 @@ void spDialog::on_TFButton_clicked()
     if(myNode->linked)
     {
         Node*node1 = myNode,*node2;
-        Link*link = myNode->myLinks.toList().at(0);
+        Link*link = myNode->myLinks.values().first();
         node2=link->myFromNode;
         if(link->myFromNode==myNode)
             node2 = link->myToNode;
@@ -637,7 +628,7 @@ void spDialog::on_TUButton_clicked()
     if(myNode->linked)
     {
         Node*node1 = myNode,*node2;
-        Link*link = myNode->myLinks.toList().at(0);
+        Link*link = myNode->myLinks.values().first();
         node2=link->myFromNode;
         if(link->myFromNode==myNode)
             node2 = link->myToNode;
@@ -683,7 +674,7 @@ void spDialog::on_TLE_editingFinished()
     if(myNode->linked)
     {
         Node*node1 = myNode,*node2;
-        Link*link = myNode->myLinks.toList().at(0);
+        Link*link = myNode->myLinks.values().first();
         node2=link->myFromNode;
         if(link->myFromNode==myNode)
             node2 = link->myToNode;
@@ -727,7 +718,7 @@ void spDialog::on_PFButton_clicked()
     if(myNode->linked)
     {
         Node*node1 = myNode,*node2;
-        Link*link = myNode->myLinks.toList().at(0);
+        Link*link = myNode->myLinks.values().first();
         node2=link->myFromNode;
         if(link->myFromNode==myNode)
             node2 = link->myToNode;
@@ -774,7 +765,7 @@ void spDialog::on_PUButton_clicked()
     if(myNode->linked)
     {
         Node*node1 = myNode,*node2;
-        Link*link = myNode->myLinks.toList().at(0);
+        Link*link = myNode->myLinks.values().first();
         node2=link->myFromNode;
         if(link->myFromNode==myNode)
             node2 = link->myToNode;
@@ -822,7 +813,7 @@ void spDialog::on_PLE_editingFinished()
     if(myNode->linked)
     {
         Node*node1 = myNode,*node2;
-        Link*link = myNode->myLinks.toList().at(0);
+        Link*link = myNode->myLinks.values().first();
         node2=link->myFromNode;
         if(link->myFromNode==myNode)
             node2 = link->myToNode;
@@ -869,7 +860,7 @@ void spDialog::on_FFButton_clicked()
     if(myNode->linked)
     {
         Node*node1 = myNode,*node2;
-        Link*link = myNode->myLinks.toList().at(0);
+        Link*link = myNode->myLinks.values().first();
         node2=link->myFromNode;
         if(link->myFromNode==myNode)
             node2 = link->myToNode;
@@ -916,7 +907,7 @@ void spDialog::on_FUButton_clicked()
     if(myNode->linked)
     {
         Node*node1 = myNode,*node2;
-        Link*link = myNode->myLinks.toList().at(0);
+        Link*link = myNode->myLinks.values().first();
         node2=link->myFromNode;
         if(link->myFromNode==myNode)
             node2 = link->myToNode;
@@ -955,7 +946,6 @@ void spDialog::on_FUButton_clicked()
 
     }
     ui->FLE->setText("Unknown");
-
 }
 
 void spDialog::on_FLE_editingFinished()
@@ -964,7 +954,7 @@ void spDialog::on_FLE_editingFinished()
     if(myNode->linked)
     {
         Node*node1 = myNode,*node2;
-        Link*link = myNode->myLinks.toList().at(0);
+        Link*link = myNode->myLinks.values().first();
         node2=link->myFromNode;
         if(link->myFromNode==myNode)
             node2 = link->myToNode;
@@ -1001,7 +991,6 @@ void spDialog::on_FLE_editingFinished()
                                  "This will set mass flow rate of sp"+QString::number(myNode->ndum)+list.join("")+" to "+text+globalpara.unitname_massflow);
         }
     }
-
 }
 
 void spDialog::on_CFButton_clicked()
@@ -1011,7 +1000,7 @@ void spDialog::on_CFButton_clicked()
     if(myNode->linked)
     {
         Node*node1 = myNode,*node2;
-        Link*link = myNode->myLinks.toList().at(0);
+        Link*link = myNode->myLinks.values().first();
         node2=link->myFromNode;
         if(link->myFromNode==myNode)
             node2 = link->myToNode;
@@ -1058,7 +1047,7 @@ void spDialog::on_CUButton_clicked()
     if(myNode->linked)
     {
         Node*node1 = myNode,*node2;
-        Link*link = myNode->myLinks.toList().at(0);
+        Link*link = myNode->myLinks.values().first();
         node2=link->myFromNode;
         if(link->myFromNode==myNode)
             node2 = link->myToNode;
@@ -1097,7 +1086,6 @@ void spDialog::on_CUButton_clicked()
 
     }
     ui->CLE->setText("Unknown");
-
 }
 
 void spDialog::on_CLE_editingFinished()
@@ -1106,7 +1094,7 @@ void spDialog::on_CLE_editingFinished()
     if(myNode->linked)
     {
         Node*node1 = myNode,*node2;
-        Link*link = myNode->myLinks.toList().at(0);
+        Link*link = myNode->myLinks.values().first();
         node2=link->myFromNode;
         if(link->myFromNode==myNode)
             node2 = link->myToNode;
@@ -1152,7 +1140,7 @@ void spDialog::on_WFButton_clicked()
     if(myNode->linked)
     {
         Node*node1 = myNode,*node2;
-        Link*link = myNode->myLinks.toList().at(0);
+        Link*link = myNode->myLinks.values().first();
         node2=link->myFromNode;
         if(link->myFromNode==myNode)
             node2 = link->myToNode;
@@ -1199,7 +1187,7 @@ void spDialog::on_WUButton_clicked()
     if(myNode->linked)
     {
         Node*node1 = myNode,*node2;
-        Link*link = myNode->myLinks.toList().at(0);
+        Link*link = myNode->myLinks.values().first();
         node2=link->myFromNode;
         if(link->myFromNode==myNode)
             node2 = link->myToNode;
@@ -1238,7 +1226,6 @@ void spDialog::on_WUButton_clicked()
 
     }
     ui->WLE->setText("Unknown");
-
 }
 
 void spDialog::on_WLE_editingFinished()
@@ -1247,7 +1234,7 @@ void spDialog::on_WLE_editingFinished()
     if(myNode->linked)
     {
         Node*node1 = myNode,*node2;
-        Link*link = myNode->myLinks.toList().at(0);
+        Link*link = myNode->myLinks.values().first();
         node2=link->myFromNode;
         if(link->myFromNode==myNode)
             node2 = link->myToNode;
@@ -1303,8 +1290,6 @@ bool spDialog::event(QEvent *e)
 }
 
 
-
-
 void spDialog::on_fluidCB_currentTextChanged(const QString &arg1)
 {
     if(arg1=="Not Assigned")
@@ -1333,7 +1318,7 @@ void spDialog::on_fluidCB_currentTextChanged(const QString &arg1)
         if(myNode->linked)
         {
             Node*node1 = myNode,*node2;
-            Link*link = myNode->myLinks.toList().at(0);
+            Link*link = myNode->myLinks.values().first();
             node2=link->myFromNode;
             if(link->myFromNode==myNode)
                 node2 = link->myToNode;
@@ -1379,7 +1364,5 @@ void spDialog::on_fluidCB_currentTextChanged(const QString &arg1)
                                      "This will set fluid type of sp"+QString::number(myNode->ndum)+list.join("")+" as "+newKsub);
             }
         }
-
     }
-
 }

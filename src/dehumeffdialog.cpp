@@ -14,13 +14,14 @@
 
 */
 
+#include <QDoubleValidator>
+#include <QMessageBox>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
+#include <QValidator>
 
 #include "dehumeffdialog.h"
 #include "ui_dehumeffdialog.h"
-#include <QMessageBox>
-#include <QValidator>
-#include <QDoubleValidator>
-
 #include "estntueffdialog.h"
 #include "mainwindow.h"
 
@@ -62,12 +63,8 @@ dehumEffDialog::dehumEffDialog(unit*unit, QWidget *parent) :
     QLayout *mainLayout = layout();
     mainLayout->setSizeConstraint(QLayout::SetFixedSize);
 
-
     QValidator *inputRange = new QDoubleValidator(0,1,7,this);
-
-    QRegExp regExp("[-.0-9]+$");
-    QRegExpValidator *regExpValidator = new QRegExpValidator(regExp,this);
-
+    QRegularExpressionValidator *regExpValidator = new QRegularExpressionValidator(QRegularExpression("[-.0-9]+$"), this);
     ui->effLine->setValidator(inputRange);
     ui->NTULine->setValidator(regExpValidator);
 }

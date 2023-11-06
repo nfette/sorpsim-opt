@@ -13,21 +13,21 @@
 
 */
 
+#include <QMessageBox>
+#include <QKeyEvent>
+#include <QRegularExpression>
+
+#include <qwt_plot_marker.h>
+#include <qwt_symbol.h>
 
 #include "overlaysettingdialog.h"
 #include "ui_overlaysettingdialog.h"
 #include "sorputils.h"
-
-#include <myscene.h>
-#include <mainwindow.h>
-#include <qwt_plot_marker.h>
-#include <qwt_symbol.h>
+#include "myscene.h"
+#include "mainwindow.h"
 #include "dataComm.h"
-#include <unitconvert.h>
-#include <unit.h>
-#include <node.h>
-#include <QMessageBox>
-#include <QKeyEvent>
+#include "unitconvert.h"
+#include "unit.h"
 
 extern globalparameter globalpara;
 extern unit * dummy;
@@ -303,7 +303,7 @@ void overlaysetting::updateXml()
             plotData = doc.elementsByTagName("plotData").at(0).toElement();
 
             QString curveName = newCurve->title().text();
-            if(curveName.count()==0)
+            if(curveName.isEmpty())
             {
                 for(int i = 1;curveNameUsed(curveName);i++)
                     curveName = "curve_"+QString::number(i);
@@ -378,7 +378,7 @@ void overlaysetting::updateXml()
 
 bool overlaysetting::curveNameUsed(QString name)
 {
-    if(name.count()==0)
+    if(name.isEmpty())
         return true;
     QString plotTempXML = Sorputils::sorpTempDir().absoluteFilePath("plotTemp.xml");
     QFile file(plotTempXML);
@@ -557,8 +557,8 @@ void overlaysetting::drawPlot()
     newCurve->setSamples(points);
     newCurve->setPen(Qt::blue,5,Qt::SolidLine);
 
-    QString givenName = ui->lineEdit->text().replace(QRegExp("[^a-zA-Z0-9_]"), "");
-    if(givenName.count()==0||curveNameUsed(givenName))
+    QString givenName = ui->lineEdit->text().replace(QRegularExpression("[^a-zA-Z0-9_]"), "");
+    if(givenName.length()==0||curveNameUsed(givenName))
     {
         for(int i = 1;curveNameUsed(givenName);i++)
             givenName = "curve_"+QString::number(i);
@@ -567,7 +567,6 @@ void overlaysetting::drawPlot()
         givenName = "curve_"+givenName;
 
     newCurve->setTitle(givenName);
-
 
     overlay_plot->curvelist<<newCurve;
     overlay_plot->curvePoints.append(thePoints);
@@ -582,7 +581,6 @@ void overlaysetting::updateLoopList()
     Node*node;
     QList<QSet<int> > compareList;
     QList<QList<int> > finalList;
-    QList<int> tempList;
 
     for(int i = 0; i < globalcount;i++)
     {
@@ -593,14 +591,11 @@ void overlaysetting::updateLoopList()
             node = iterator->myNodes[j];
             if(globalpara.findNextPtxPoint(node,node))
             {
-                tempList = globalpara.ptxStream;
-//                foreach(QSet<int> h,compareList)
-//                    qDebug()<<"compareList"<<h;
-//                qDebug()<<globalpara.ptxStream<<"\n\n";
-                if(!compareList.contains(tempList.toSet())&&tempList.first()==tempList.last()&&tempList.count()>1)
+                QSet<int> tempSet(globalpara.ptxStream.begin(), globalpara.ptxStream.end());
+                if(!compareList.contains(tempSet)&&globalpara.ptxStream.first()==globalpara.ptxStream.last()&&globalpara.ptxStream.count()>1)
                 {
-                    compareList.append(tempList.toSet());
-                    finalList.append(tempList);
+                    compareList.append(tempSet);
+                    finalList.append(globalpara.ptxStream);
                 }
             }
         }
@@ -644,9 +639,6 @@ void overlaysetting::updateLoopList()
             string.append(","+QString::number(list.at(j)));
         ui->loopList->addItem(string);
     }
-
-
-
 }
 
 void overlaysetting::debugg()
@@ -741,7 +733,7 @@ void overlaysetting::on_pushButton_2_clicked()//remove current sp from list
 
 void overlaysetting::on_pushButton_add_input_clicked()//add sp by typing in its index
 {
-    ui->lineEdit_SPindex->text().replace(QRegExp("[^0-9]"), "");
+    ui->lineEdit_SPindex->text().replace(QRegularExpression("[^0-9]"), "");
     if (ui->lineEdit_SPindex->text().toInt()>spnumber)
     {
         QMessageBox message;

@@ -14,8 +14,6 @@
 
 */
 
-
-
 #include "fluiddialog.h"
 #include "ui_fluiddialog.h"
 #include "unit.h"
@@ -23,8 +21,8 @@
 #include "mainwindow.h"
 #include "dataComm.h"
 
-#include <QMessageBox>
 #include <QDebug>
+#include <QMessageBox>
 #include <QLayout>
 
 extern globalparameter globalpara;
@@ -115,8 +113,6 @@ void fluidDialog::on_OkButton_clicked()
 //            setBox.setText(fluids+" are set as fluids in the cycle.");
 //        setBox.exec();
 
-
-
         unit* iterator = dummy;
         for(int i = 0;i<globalcount;i++)
         {
@@ -127,14 +123,11 @@ void fluidDialog::on_OkButton_clicked()
                 {
                     iterator->myNodes[j]->ksub = 0;
                     if(iterator->myNodes[j]->linked)
-                        iterator->myNodes[j]->myLinks.toList().first()->setColor();
+                        iterator->myNodes[j]->myLinks.values().first()->setColor();
                 }
 
             }
         }
-
-
-
         accept();
     }
 

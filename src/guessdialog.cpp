@@ -134,7 +134,6 @@ void guessDialog::on_applyButton_clicked()
         }
     }
 
-
     accept();
 }
 
@@ -167,9 +166,7 @@ void guessDialog::setupTable()
                         titem->setReadOnly(true);
                         titem->setStyleSheet("QLineEdit{background: rgb(192, 192, 192);}");
                     }
-                    else
-                        nt++;
-
+                    else nt++;
 
                     QLineEdit * fitem = new QLineEdit;
                     fitem->setText(QString::number(iterator->myNodes[j]->f,'g',4));
@@ -180,10 +177,7 @@ void guessDialog::setupTable()
                         fitem->setReadOnly(true);
                         fitem->setStyleSheet("QLineEdit{background: rgb(192, 192, 192);}");
                     }
-                    else
-                        nf++;
-
-
+                    else nf++;
 
                     QLineEdit * pitem = new QLineEdit;
                     pitem->setText(QString::number(iterator->myNodes[j]->p,'g',4));
@@ -196,8 +190,6 @@ void guessDialog::setupTable()
                     }
                     else np++;
 
-
-
                     QLineEdit * citem = new QLineEdit;
                     citem->setText(QString::number(iterator->myNodes[j]->c,'g',4));
                     ui->guessTable->setCellWidget(i,3,citem);
@@ -208,8 +200,6 @@ void guessDialog::setupTable()
                         citem->setStyleSheet("QLineEdit{background: rgb(192, 192, 192);}");
                     }
                     else nc++;
-
-
 
                     QLineEdit * witem = new QLineEdit;
                     witem->setText(QString::number(iterator->myNodes[j]->w,'g',4));
@@ -223,14 +213,10 @@ void guessDialog::setupTable()
                     else nw++;
 
                     found = true;
-
                 }
             }
         }
     }
-
-
-
 }
 
 void guessDialog::adjustTableSize()
@@ -263,10 +249,9 @@ void guessDialog::showEvent(QShowEvent *e)
     adjustTableSize();
 }
 
-
-
 void guessDialog::on_exportBox_currentTextChanged(const QString &arg1)
 {
+    QByteArray byteArray;
     QTableWidget* currentTable = ui->guessTable;
     if(arg1=="Copy to clipboard")
     {
@@ -282,43 +267,33 @@ void guessDialog::on_exportBox_currentTextChanged(const QString &arg1)
             }
         }
 
-
-        myByteArray.clear();
-
         for(int i = 0; i < currentTable->columnCount();i++)
         {
-            QString string = currentTable->horizontalHeaderItem(i)->text();
-            string.replace("\n",",");
-            myByteArray.append(string);
-            myByteArray.append("\t");
+            QString str = currentTable->horizontalHeaderItem(i)->text();
+            str.replace('\n',',');
+            str.append('\t');
+            byteArray.append(str.toUtf8());
         }
-        myByteArray.remove(myByteArray.length()-1,1);
-        myByteArray.append("\n");
-
+        byteArray.remove(byteArray.length() - 1, 1);
+        byteArray.append('\n');
 
         int counter=1;
         for(int i = 0; i < selected.count();i++)
         {
-            if(counter%5!=0)
+            if(counter%5==0)
             {
-                myByteArray.append(selected.at(i));
-                myByteArray.append("\t");
+                byteArray.remove(byteArray.length() - 1, 1);
+                byteArray.append('\n');
             }
-            else
-            {
-                myByteArray.remove(myByteArray.length()-1,1);
-                myByteArray.append("\n");
-                myByteArray.append(selected.at(i));
-                myByteArray.append("\t");
-            }
+            byteArray.append(selected[i].toUtf8());
+            byteArray.append('\t');
             counter++;
         }
-        myByteArray.remove(myByteArray.length()-1,1);
+        byteArray.remove(byteArray.length() - 1, 1);
 
         QMimeData * mimeData = new QMimeData();
-        mimeData->setData("text/plain",myByteArray);
+        mimeData->setData("text/plain", byteArray);
         QApplication::clipboard()->setMimeData(mimeData);
-
     }
     else if(arg1 == "Export to text file")
     {
@@ -336,39 +311,33 @@ void guessDialog::on_exportBox_currentTextChanged(const QString &arg1)
                     selected.append(item->text());
                 }
             }
-            myByteArray.clear();
 
             for(int i = 0; i < currentTable->columnCount();i++)
             {
-                QString string = currentTable->horizontalHeaderItem(i)->text();
-                string.replace("\n",",");
-                myByteArray.append(string);
-                myByteArray.append("\t");
+                QString str = currentTable->horizontalHeaderItem(i)->text();
+                str.replace('\n',',');
+                str.append('\t');
+                byteArray.append(str.toUtf8());
             }
-            myByteArray.remove(myByteArray.length()-1,1);
-            myByteArray.append("\n");
+            byteArray.remove(byteArray.length() - 1, 1);
+            byteArray.append('\n');
 
             int counter=1;
             for(int i = 0; i < selected.count();i++)
             {
-                if(counter%5!=0)
+                if(counter%5==0)
                 {
-                    myByteArray.append(selected.at(i));
-                    myByteArray.append("\t");
+                    byteArray.remove(byteArray.length() - 1, 1);
+                    byteArray.append('\n');
                 }
-                else
-                {
-                    myByteArray.remove(myByteArray.length()-1,1);
-                    myByteArray.append("\n");
-                    myByteArray.append(selected.at(i));
-                    myByteArray.append("\t");
-                }
+                byteArray.append(selected[i].toUtf8());
+                byteArray.append('\t');
                 counter++;
             }
-            myByteArray.remove(myByteArray.length()-1,1);
+            byteArray.remove(byteArray.length() - 1, 1);
 
-            QString string(myByteArray);
-            string.replace("℃","C");
+            QString string(byteArray);
+            string.replace("℃", "C");
             QFile tfile(fileName);
             QTextStream tstream(&tfile);
             if(!tfile.open(QIODevice::WriteOnly|QIODevice::Text))
@@ -378,7 +347,6 @@ void guessDialog::on_exportBox_currentTextChanged(const QString &arg1)
                 tstream<<string;
                 tfile.close();
             }
-
         }
     }
     ui->exportBox->setCurrentIndex(0);

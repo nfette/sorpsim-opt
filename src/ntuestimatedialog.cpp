@@ -13,21 +13,22 @@
 
 */
 
+#include <QDebug>
+#include <QDoubleValidator>
+#include <QLayout>
+#include <QMessageBox>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
+#include <QValidator>
 
+#include <math.h>
 #include "ntuestimatedialog.h"
 #include "ui_ntuestimatedialog.h"
-#include "myscene.h"
-#include <QDebug>
 #include "sorpsimEngine.h"
 #include "dataComm.h"
 #include "mainwindow.h"
 #include "unitconvert.h"
 #include "ldaccompdialog.h"
-#include <QMessageBox>
-#include <math.h>
-#include <QLayout>
-#include <QValidator>
-#include <QDoubleValidator>
 
 extern globalparameter globalpara;
 extern LDACcompDialog*ldacDialog;
@@ -50,7 +51,6 @@ NTUestimateDialog::NTUestimateDialog(unit *estUnit, QWidget *parent) :
     myScene = new spScene(this);
     ui->myView->setScene(myScene);
     ui->myView->setRenderHint(QPainter::TextAntialiasing);
-
 
     ui->FluidBox->insertItem(0,"LiCl-water");
     ui->FluidBox->insertItem(0,"LiBr-water");
@@ -130,7 +130,6 @@ NTUestimateDialog::NTUestimateDialog(unit *estUnit, QWidget *parent) :
         ms = convert(myUnit->myNodes[si]->f,mass_flow_rate[globalpara.unitindex_massflow],mass_flow_rate[1]);
         ui->msiMrrLine->setText(QString::number(myUnit->myNodes[si]->f));
 
-
         // TODO: document intent and make this consistent
         switch (myUnit->myNodes[0]->ksub)
         {
@@ -147,9 +146,7 @@ NTUestimateDialog::NTUestimateDialog(unit *estUnit, QWidget *parent) :
             break;
         }
         }
-
     }
-
 
     ui->waiLabel->setText("Air inlet["+QString::number(ai+1)+"] humidity ratio:");
     ui->waoLabel->setText("Air outlet["+QString::number(ao+1)+"] humidity ratio:");
@@ -177,8 +174,7 @@ NTUestimateDialog::NTUestimateDialog(unit *estUnit, QWidget *parent) :
     QLayout *mainLayout = layout();
     mainLayout->setSizeConstraint(QLayout::SetFixedSize);
 
-    QRegExp regExp("[-.0-9]+$");
-    QRegExpValidator *regExpValidator = new QRegExpValidator(regExp,this);
+    QRegularExpressionValidator *regExpValidator = new QRegularExpressionValidator(QRegularExpression("[-.0-9]+$"), this);
     ui->waiLMLine->setValidator(regExpValidator);
     ui->waiMrrLine->setValidator(regExpValidator);
     ui->waoEstLine->setValidator(regExpValidator);
@@ -191,7 +187,6 @@ NTUestimateDialog::NTUestimateDialog(unit *estUnit, QWidget *parent) :
     ui->xsoLMLine->setValidator(regExpValidator);
     ui->maiMrrLine->setValidator(regExpValidator);
     ui->msiMrrLine->setValidator(regExpValidator);
-
 }
 
 NTUestimateDialog::~NTUestimateDialog()
@@ -258,7 +253,6 @@ bool NTUestimateDialog::event(QEvent *e)
     }
     return QDialog::event(e);
 }
-
 
 void NTUestimateDialog::on_estimateButton_clicked()
 {
@@ -341,7 +335,6 @@ void NTUestimateDialog::on_moistureButton_clicked()
     ui->inletoutletBox->hide();
     ui->moistureBox->show();
 }
-
 
 void NTUestimateDialog::on_applyButton_clicked()
 {
@@ -482,7 +475,6 @@ void NTUestimateDialog::on_waoEstLine_editingFinished()
     {
     }
     ui->mrrLine->setText(QString::number(mrrTemp));
-
 }
 
 void NTUestimateDialog::on_mrrButton_toggled(bool checked)
@@ -497,5 +489,4 @@ void NTUestimateDialog::on_mrrButton_toggled(bool checked)
         ui->mrrLine->setDisabled(true);
         ui->waoEstLine->setEnabled(true);
     }
-
 }

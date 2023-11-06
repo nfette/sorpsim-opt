@@ -241,13 +241,12 @@ void sysSettingDialog::on_okButton_clicked()
                         sps.append("sp"+QString::number(iterator->myNodes[j]->ndum));
                     if(iterator->myNodes[j]->linked)
                     {
-                        Link*link = iterator->myNodes[j]->myLinks.toList().first();
+                        Link*link = iterator->myNodes[j]->myLinks.values().first();
                         link->myFromNode->ksub=0;
                         link->myToNode->ksub=0;
                         link->setColor();
                     }
                 }
-
             }
         }
         QString text;
@@ -298,7 +297,6 @@ void sysSettingDialog::setSI(bool setsi)
         ui->radioButton_10->setText("J");
         ui->label_2->setText("Mass Unit :  kg");
     }
-
 }
 
 void sysSettingDialog::setIP(bool setip)
@@ -316,7 +314,6 @@ void sysSettingDialog::setIP(bool setip)
         ui->groupBox_5->setVisible(false);
         ui->radioButton_9->setChecked(false);
         ui->label_2->setText("Mass Unit :  lbs \nEnergy Unit : Btu");
-
     }
 }
 
@@ -456,8 +453,6 @@ void sysSettingDialog::convertSysToBasic()
             iterator->myNodes[j]->p = convert(iterator->myNodes[j]->p,pressure[globalpara.unitindex_pressure],pressure[8]);
         }
     }
-
-
 }
 
 void sysSettingDialog::convertSysToCurrent()
@@ -509,4 +504,3 @@ bool sysSettingDialog::event(QEvent *e)
     }
     return QDialog::event(e);
 }
-

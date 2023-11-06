@@ -14,15 +14,13 @@
 
 */
 
-
 #include "mainwindow.h"
 #include "sorputils.h"
 #include <QApplication>
+#include <QDateTime>
 #include <QDomImplementation>
-// #include <QDebug>
 #include <QFile>
 #include <QTextStream>
-#include <QDateTime>
 
 /// start a new mainwindow and leave all interactions to the mainwindow
 /// - once the mainwindow is closed, the application is closed as well
@@ -35,19 +33,19 @@ int main(int argc, char *argv[])
     QFile logfile(Sorputils::sorpLog());
     logfile.open(QFile::Append | QFile::Text);
     QTextStream log(&logfile);
-    log << QString("[%1] Starting up.").arg(QDateTime::currentDateTime().toString(Qt::ISODate)) << endl;
+    log << QString("[%1] Starting up.").arg(QDateTime::currentDateTime().toString(Qt::ISODate)) << Qt::endl;
 
     QDir dir = qApp->applicationDirPath();
-    log << "applicationDirPath() =" << dir.path() << endl;
-    log << "absolutePath() =" << dir.absolutePath() << endl;
-    log << "canonicalPath =" << dir.canonicalPath() << endl;
+    log << "applicationDirPath() =" << dir.path() << Qt::endl;
+    log << "absolutePath() =" << dir.absolutePath() << Qt::endl;
+    log << "canonicalPath =" << dir.canonicalPath() << Qt::endl;
 
     QDir dir2;
-    log << "Default dir =" << dir2.path() << endl;
-    log << "absolutePath =" << dir2.absolutePath() << endl;
-    log << "canonicalPath =" << dir2.canonicalPath() << endl;
+    log << "Default dir =" << dir2.path() << Qt::endl;
+    log << "absolutePath =" << dir2.absolutePath() << Qt::endl;
+    log << "canonicalPath =" << dir2.canonicalPath() << Qt::endl;
 
-    log << endl << endl;
+    log << Qt::endl << Qt::endl;
     log.flush();
     logfile.close();
 

@@ -14,22 +14,21 @@
 
 */
 
+#include <QDebug>
+#include <QInputDialog>
+#include <QLineEdit>
+#include <QListView>
+#include <QMessageBox>
+#include <QModelIndex>
+#include <QSet>
+#include <QStringList>
+#include <QStringListModel>
 
 #include "ipfixdialog.h"
 #include "ui_ipfixdialog.h"
-#include <QListView>
-#include <QStringList>
 #include "mainwindow.h"
 #include "unit.h"
-#include "node.h"
 #include "link.h"
-#include <QStringListModel>
-#include <QDebug>
-#include <QMessageBox>
-#include <QInputDialog>
-#include <QLineEdit>
-#include <QModelIndex>
-#include <QSet>
 #include "dataComm.h"
 #include "vicheckdialog.h"
 
@@ -76,49 +75,37 @@ ipfixDialog::ipfixDialog(QWidget *parent) :
                 theNode->searchAllSet("p");
                 pList = globalpara.allSet;
 
-                if((theNode->linked&&pList.count()==2&&theNode==theNode->myLinks.toList().first()->myToNode)
+                if((theNode->linked&&pList.count()==2&&theNode==theNode->myLinks.values().first()->myToNode)
                         ||(!theNode->linked&&pList.count()==1)){
 //single point
-                    if(!cbListP.contains("P#"+QString::number(theNode->ndum))){
-                    cbListP.append("P#"+QString::number(theNode->ndum));
-
-                    }
-
+                    if(!cbListP.contains("P#"+QString::number(theNode->ndum)))
+                        cbListP.append("P#"+QString::number(theNode->ndum));
                 }
-                else if(!(theNode->linked&&pList.count()==2&&theNode==theNode->myLinks.toList().first()->myFromNode)){
+                else if(!(theNode->linked&&pList.count()==2&&theNode==theNode->myLinks.values().first()->myFromNode)){
 //in a stream
                     tempListP.clear();
                     QList<int> list;
                     for(int i = 0; i < pList.count(); i++){
-                        Node * node = pList.toList().at(i);
-                        if(!list.contains(node->ndum)){
+                        Node * node = pList.values().at(i);
+                        if(!list.contains(node->ndum))
                             list.append(node->ndum);
-                        }
                     }
-                    qSort(list.begin(),list.end());
+                    std::sort(list.begin(),list.end());
 
-                    for(int i = 0; i < list.count(); i++){
+                    for(int i = 0; i < list.count(); i++)
                         tempListP.append(QString::number(list.at(i)));
-                    }
 
-
-                    if(!cbListP.contains("P-Stream: "+tempListP.join(","))){
+                    if(!cbListP.contains("P-Stream: "+tempListP.join(",")))
                         cbListP.append("P-Stream: "+tempListP.join(","));
                 }
-
-                }
-
             }
         }
     }
-
 
     ui->tCB1->addItems(cbListP);
     ui->tCB2->addItems(cbListP);
 
     updateList();
-
-
 }
 
 ipfixDialog::~ipfixDialog()
@@ -136,12 +123,11 @@ void ipfixDialog::updateTempSets()
         QList<QSet<Node*> > newBigSet;
 
         for(int m = 0; m < tempSet.count(); m++){
-            Node* node = tempSet.toList().at(m);
+            Node* node = tempSet.values().at(m);
             bool isIn = false;
             foreach(QSet<Node*> smallSet, newBigSet){
-                if(smallSet.contains(node)){
+                if(smallSet.contains(node))
                     isIn = true;
-                }
             }
             if(!isIn){
                 globalpara.allSet.clear();
@@ -149,7 +135,6 @@ void ipfixDialog::updateTempSets()
                 scanSet = globalpara.allSet;
                 newBigSet.append(scanSet);
             }
-
         }
         pSets.append(newBigSet);
     }
@@ -163,28 +148,25 @@ void ipfixDialog::updateList()
     groupListP.clear();
     foreach(QList<QSet<Node*> > set,pSets){
         foreach(QSet<Node*> eachSet, set){
-            if(eachSet.count()==1||(eachSet.count()==2&&eachSet.toList().first()->ndum==eachSet.toList().last()->ndum)){
+            if(eachSet.count()==1||(eachSet.count()==2&&eachSet.values().first()->ndum==eachSet.values().last()->ndum)){
                 //for single point
-                groupListP<<"["+QString::number(eachSet.toList().first()->ndum)+"]";
+                groupListP<<"["+QString::number(eachSet.values().first()->ndum)+"]";
             }
             else{
                 //for stream
                 QList<int> list;
                 foreach(Node* node,eachSet){
-                    if(!list.contains(node->ndum)){
+                    if(!list.contains(node->ndum))
                         list<<node->ndum;
-                    }
                 }
-                qSort(list.begin(),list.end());
+                std::sort(list.begin(),list.end());
                 QStringList sList;
-                for(int i = 0; i < list.count();i++){
+                for(int i = 0; i < list.count();i++)
                     sList<<QString::number(list.at(i));
-                }
                 groupListP<<"[";
                 groupListP.append(sList.join(","));
                 groupListP<<"]";
             }
-
         }
         QString groups = groupListP.join("");
         if(!listListP.contains(groups)){
@@ -193,11 +175,9 @@ void ipfixDialog::updateList()
         groupListP.clear();
     }
 
-
     listModelP = new QStringListModel;
     listModelP->setStringList(listListP);
     ui->listView->setModel(listModelP);
-
 }
 
 void ipfixDialog::on_addButton_clicked()
@@ -372,7 +352,7 @@ void ipfixDialog::on_removeButton_clicked()
                 globalpara.allSet.clear();
                 node->searchAllSet("p");
                 QSet<Node*> newSet = globalpara.allSet;
-                if(newSet.count()==1||(newSet.count()==2&&newSet.toList().first()->linked)){
+                if(newSet.count()==1||(newSet.count()==2&&newSet.values().first()->linked)){
                     //a lone point
                 }
                 else{

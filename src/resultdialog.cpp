@@ -31,9 +31,7 @@
 #include "ui_resultdialog.h"
 #include "mainwindow.h"
 #include "unit.h"
-#include "node.h"
 #include "dataComm.h"
-#include "sorpsimEngine.h"
 #include "unitconvert.h"
 
 extern int globalcount;
@@ -96,7 +94,6 @@ resultDialog::resultDialog(QWidget *parent) :
     unitTable->verticalHeader()->setVisible(false);
     ui->tabWidget->insertTab(-1,unitTable,"Components");
 
-
     LDACTable = new QTableWidget();
     LDACTable->setRowCount(globalpara.LDACcount);
     LDACTable->resizeColumnsToContents();
@@ -149,7 +146,6 @@ resultDialog::resultDialog(QWidget *parent) :
             {
                 if(iterator->myNodes[i]->ndum== p+1)
                 {
-
                     double tt = convert(iterator->myNodes[i]->tr,temperature[3],temperature[globalpara.unitindex_temperature]);
                     double hh = convert(iterator->myNodes[i]->hr,enthalpy[2],enthalpy[globalpara.unitindex_enthalpy]);
                     double ff = convert(iterator->myNodes[i]->fr,mass_flow_rate[1],mass_flow_rate[globalpara.unitindex_massflow]);
@@ -164,7 +160,7 @@ resultDialog::resultDialog(QWidget *parent) :
                     item = new QTableWidgetItem;
                     item->setText(QString::number(tt,'g',4));
                     if(iterator->myNodes[i]->itfix>0)
-                        item->setBackgroundColor(QColor(204, 255, 204));
+                        item->setBackground(QColor(204, 255, 204));
                     item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
                     spTable->setItem(p,1,item);
 
@@ -176,28 +172,28 @@ resultDialog::resultDialog(QWidget *parent) :
                     item = new QTableWidgetItem;
                     item->setText(QString::number(ff,'g',4));
                     if(iterator->myNodes[i]->iffix>0)
-                        item->setBackgroundColor(QColor(204, 255, 204));
+                        item->setBackground(QColor(204, 255, 204));
                     item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
                     spTable->setItem(p,3,item);
 
                     item = new QTableWidgetItem;
                     item->setText(QString::number(iterator->myNodes[i]->cr,'g',4));
                     if(iterator->myNodes[i]->icfix>0)
-                        item->setBackgroundColor(QColor(204, 255, 204));
+                        item->setBackground(QColor(204, 255, 204));
                     item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
                     spTable->setItem(p,4,item);
 
                     item = new QTableWidgetItem;
                     item->setText(QString::number(pp,'g',4));
                     if(iterator->myNodes[i]->ipfix>0)
-                        item->setBackgroundColor(QColor(204, 255, 204));
+                        item->setBackground(QColor(204, 255, 204));
                     item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
                     spTable->setItem(p,5,item);
 
                     item = new QTableWidgetItem;
                     item->setText(QString::number(iterator->myNodes[i]->wr,'g',4));
                     if(iterator->myNodes[i]->iwfix>0)
-                        item->setBackgroundColor(QColor(204, 255, 204));
+                        item->setBackground(QColor(204, 255, 204));
                     item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
                     spTable->setItem(p,6,item);
                 }
@@ -298,8 +294,6 @@ resultDialog::resultDialog(QWidget *parent) :
         iterator = iterator->next;
     }
 
-
-
     ui->exportBox->addItem("Export...");
     ui->exportBox->addItem("Copy table content");
     ui->exportBox->addItem("Copy table w/ header");
@@ -308,7 +302,6 @@ resultDialog::resultDialog(QWidget *parent) :
     ui->exportBox->addItem("Export to file..");
 
     initializing = false;
-
 }
 
 resultDialog::~resultDialog()
@@ -318,34 +311,23 @@ resultDialog::~resultDialog()
 
 void resultDialog::onTableItemChanged()
 {
-    QTableWidget * currentTable = dynamic_cast<QTableWidget *>(ui->tabWidget->currentWidget());
-
+    QString str;
+    QTableWidget *currentTable = dynamic_cast<QTableWidget *>(ui->tabWidget->currentWidget());
     selected = currentTable->selectedItems();
 
     myByteArray.clear();
 
     int row0 = selected.first()->row();
-    int row1;
-
-    for(int i = 0; i < selected.size();i++)
+    for(int i = 0; i < selected.size(); i++)
     {
-        row1 = selected.at(i)->row();
-
+        int row1 = selected[i]->row();
         if(row1 != row0)
-        {
-            myByteArray.append("\n");
-            myByteArray.append(selected.at(i)->text());
-            myByteArray.append("\t");
-        }
-        else
-        {
-            myByteArray.append(selected.at(i)->text());
-            myByteArray.append("\t");
-        }
-
+            str.append('\n');
+        str.append(selected[i]->text());
+        str.append('\t');
         row0 = row1;
     }
-
+    myByteArray.append(str.toUtf8());
 }
 
 void resultDialog::keyPressEvent(QKeyEvent *event)
@@ -354,12 +336,11 @@ void resultDialog::keyPressEvent(QKeyEvent *event)
     {
         onTableItemChanged();
         QMimeData * mimeData = new QMimeData();
-        mimeData->setData("text/plain",myByteArray);
+        mimeData->setData("text/plain", myByteArray);
         QApplication::clipboard()->setMimeData(mimeData);
         qDebug()<<"copied!";
     }
 }
-
 
 void resultDialog::on_exportBox_activated(const QString &arg1)
 {
@@ -380,30 +361,22 @@ void resultDialog::on_exportBox_activated(const QString &arg1)
         myByteArray.clear();
 
         int row0 = selected.first()->row();
-        int row1;
-
         for(int i = 0; i < selected.size();i++)
         {
-            row1 = selected.at(i)->row();
-            if(row1 != row0)
+            int row1 = selected[i]->row();
+            if (row1 != row0)
             {
-                myByteArray.remove(myByteArray.length()-1,1);
-                myByteArray.append("\n");
-                myByteArray.append(selected.at(i)->text());
-                myByteArray.append("\t");
+                myByteArray.remove(myByteArray.length() - 1, 1);
+                myByteArray.append('\n');
             }
-            else
-            {
-                myByteArray.append(selected.at(i)->text());
-                myByteArray.append("\t");
-            }
-
+            myByteArray.append(selected[i]->text().toUtf8());
+            myByteArray.append('\t');
             row0 = row1;
         }
-        myByteArray.remove(myByteArray.length()-1,1);
+        myByteArray.remove(myByteArray.length() - 1, 1);
 
         QMimeData * mimeData = new QMimeData();
-        mimeData->setData("text/plain",myByteArray);
+        mimeData->setData("text/plain", myByteArray);
         QApplication::clipboard()->setMimeData(mimeData);
         qDebug()<<"all table content copied!";
         copied = true;
@@ -425,39 +398,31 @@ void resultDialog::on_exportBox_activated(const QString &arg1)
 
         for(int i = 0; i < currentTable->columnCount();i++)
         {
-            QString string = currentTable->horizontalHeaderItem(i)->text();
-            string.replace("\n",",");
-            myByteArray.append(string);
-            myByteArray.append("\t");
+            QString str = currentTable->horizontalHeaderItem(i)->text();
+            str.replace('\n',',');
+            str.append('\t');
+            myByteArray.append(str.toUtf8());
         }
-        myByteArray.remove(myByteArray.length()-1,1);
-        myByteArray.append("\n");
+        myByteArray.remove(myByteArray.length() - 1, 1);
+        myByteArray.append('\n');
 
         int row0 = selected.first()->row();
-        int row1;
-
         for(int i = 0; i < selected.size();i++)
         {
-            row1 = selected.at(i)->row();
+            int row1 = selected[i]->row();
             if(row1 != row0)
             {
-                myByteArray.remove(myByteArray.length()-1,1);
-                myByteArray.append("\n");
-                myByteArray.append(selected.at(i)->text());
-                myByteArray.append("\t");
+                myByteArray.remove(myByteArray.length() - 1, 1);
+                myByteArray.append('\n');
             }
-            else
-            {
-                myByteArray.append(selected.at(i)->text());
-                myByteArray.append("\t");
-            }
-
+            myByteArray.append(selected[i]->text().toUtf8());
+            myByteArray.append('\t');
             row0 = row1;
         }
         myByteArray.remove(myByteArray.length()-1,1);
 
         QMimeData * mimeData = new QMimeData();
-        mimeData->setData("text/plain",myByteArray);
+        mimeData->setData("text/plain", myByteArray);
         QApplication::clipboard()->setMimeData(mimeData);
         qDebug()<<"Table content copied with header!";
         copied = true;
@@ -479,44 +444,36 @@ void resultDialog::on_exportBox_activated(const QString &arg1)
             QList<int> headers;
             for(int i = 0; i < selected.length();i++)
             {
-                if(!headers.contains(selected.at(i)->column()))
-                    headers.append(selected.at(i)->column());
+                if(!headers.contains(selected[i]->column()))
+                    headers.append(selected[i]->column());
             }
             for(int i = 0; i < headers.length();i++)
             {
-                QString string = currentTable->horizontalHeaderItem(headers.at(i))->text();
-                string.replace("\n","");
-                myByteArray.append(string);
-                myByteArray.append("\t");
+                QString str = currentTable->horizontalHeaderItem(headers[i])->text();
+                str.replace('\n',"");
+                str.append('\t');
+                myByteArray.append(str.toUtf8());
             }
-            myByteArray.remove(myByteArray.length()-1,1);
-            myByteArray.append("\n");
+            myByteArray.remove(myByteArray.length() - 1, 1);
+            myByteArray.append('\n');
 
             int row0 = selected.first()->row();
-            int row1;
-
-            for(int i = 0; i < selected.size();i++)
+            for(int i = 0; i < selected.size(); i++)
             {
-                row1 = selected.at(i)->row();
+                int row1 = selected[i]->row();
                 if(row1 != row0)
                 {
-                    myByteArray.remove(myByteArray.length()-1,1);
-                    myByteArray.append("\n");
-                    myByteArray.append(selected.at(i)->text());
-                    myByteArray.append("\t");
+                    myByteArray.remove(myByteArray.length() - 1, 1);
+                    myByteArray.append('\n');
                 }
-                else
-                {
-                    myByteArray.append(selected.at(i)->text());
-                    myByteArray.append("\t");
-                }
-
+                myByteArray.append(selected[i]->text().toUtf8());
+                myByteArray.append('\t');
                 row0 = row1;
             }
             myByteArray.remove(myByteArray.length()-1,1);
 
             QMimeData * mimeData = new QMimeData();
-            mimeData->setData("text/plain",myByteArray);
+            mimeData->setData("text/plain", myByteArray);
             QApplication::clipboard()->setMimeData(mimeData);
             qDebug()<<"Selected content copied with header!";
             copied = true;
@@ -533,36 +490,26 @@ void resultDialog::on_exportBox_activated(const QString &arg1)
         }
         else
         {
-
             selected = currentTable->selectedItems();
 
             myByteArray.clear();
 
             int row0 = selected.first()->row();
-            int row1;
-
-            for(int i = 0; i < selected.size();i++)
+            for(int i = 0; i < selected.size(); i++)
             {
-                row1 = selected.at(i)->row();
-
+                int row1 = selected.at(i)->row();
                 if(row1 != row0)
                 {
-                    myByteArray.remove(myByteArray.length()-1,1);
-                    myByteArray.append("\n");
-                    myByteArray.append(selected.at(i)->text());
-                    myByteArray.append("\t");
+                    myByteArray.remove(myByteArray.length() - 1, 1);
+                    myByteArray.append('\n');
                 }
-                else
-                {
-                    myByteArray.append(selected.at(i)->text());
-                    myByteArray.append("\t");
-                }
-
+                myByteArray.append(selected[i]->text().toUtf8());
+                myByteArray.append('\t');
                 row0 = row1;
             }
-            myByteArray.remove(myByteArray.length()-1,1);
+            myByteArray.remove(myByteArray.length() - 1, 1);
             QMimeData * mimeData = new QMimeData();
-            mimeData->setData("text/plain",myByteArray);
+            mimeData->setData("text/plain", myByteArray);
             QApplication::clipboard()->setMimeData(mimeData);
             qDebug()<<"Selected content copied!";
             copied = true;
@@ -577,8 +524,8 @@ void resultDialog::on_exportBox_activated(const QString &arg1)
         if(fileName!="")
         {
             QPrinter myPrinter(QPrinter::ScreenResolution);
-            myPrinter.setOrientation(QPrinter::Landscape);
-            myPrinter.setPaperSize(QPrinter::A4);
+            myPrinter.setPageOrientation(QPageLayout::Landscape);
+            myPrinter.setPageSize(QPageSize::A4);
             //if pdf
             myPrinter.setOutputFormat(QPrinter::PdfFormat);
             myPrinter.setOutputFileName(fileName);
@@ -612,36 +559,28 @@ void resultDialog::on_exportBox_activated(const QString &arg1)
 
             for(int i = 0; i < currentTable->columnCount();i++)
             {
-                QString string = currentTable->horizontalHeaderItem(i)->text();
-                string.replace("\n","");
-                myByteArray.append(string);
-                myByteArray.append("\t");
+                QString str = currentTable->horizontalHeaderItem(i)->text();
+                str.replace('\n',"");
+                str.append('\t');
+                myByteArray.append(str.toUtf8());
             }
-            myByteArray.remove(myByteArray.length()-1,1);
-            myByteArray.append("\n");
+            myByteArray.remove(myByteArray.length() - 1, 1);
+            myByteArray.append('\n');
 
             int row0 = selected.first()->row();
-            int row1;
-
             for(int i = 0; i < selected.size();i++)
             {
-                row1 = selected.at(i)->row();
+                int row1 = selected[i]->row();
                 if(row1 != row0)
                 {
-                    myByteArray.remove(myByteArray.length()-1,1);
-                    myByteArray.append("\n");
-                    myByteArray.append(selected.at(i)->text());
-                    myByteArray.append("\t");
+                    myByteArray.remove(myByteArray.length() - 1, 1);
+                    myByteArray.append('\n');
                 }
-                else
-                {
-                    myByteArray.append(selected.at(i)->text());
-                    myByteArray.append("\t");
-                }
-
+                myByteArray.append(selected[i]->text().toUtf8());
+                myByteArray.append('\t');
                 row0 = row1;
             }
-            myByteArray.remove(myByteArray.length()-1,1);
+            myByteArray.remove(myByteArray.length() - 1, 1);
             QString string(myByteArray);
             string.replace("℃","C");
             QFile tfile(fileName);

@@ -45,7 +45,6 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QProcess>
-#include <qmath.h>
 #include <QObject>
 #include <QMimeData>
 #include <QPainter>
@@ -54,7 +53,6 @@
 #include <QPrintPreviewDialog>
 #include <QPrintDialog>
 #include <QPicture>
-
 
 extern myScene * theScene;
 extern unit * dummy;
@@ -921,7 +919,7 @@ void tableDialog::calcTable()
     for(int i = 0; i < runs; i ++){
         for(int p = 0; p < (inputEntries.count());p++)
         {
-            tableToCalculate->item(i,p)->setBackgroundColor(Qt::white);
+            tableToCalculate->item(i,p)->setBackground(Qt::white);
         }
     }
 
@@ -1033,7 +1031,7 @@ void tableDialog::calcTable()
         {
             for(int p = 0; p < (inputEntries.count());p++)
             {
-                tableToCalculate->item(i,p)->setBackgroundColor(Qt::red);
+                tableToCalculate->item(i,p)->setBackground(Qt::red);
             }
             for(int q = inputEntries.count();
                 q < inputEntries.count()+outputEntries.count(); q++)
@@ -1658,29 +1656,19 @@ void tableDialog::onTableItemChanged()
     myByteArray.clear();
 
     int row0 = selected.first()->row();
-    int row1;
-
     for(int i = 0; i < selected.size();i++)
     {
-        row1 = selected.at(i)->row();
-
+        int row1 = selected[i]->row();
         if(row1 != row0)
         {
             myByteArray.remove(myByteArray.length()-1,1);
-            myByteArray.append("\n");
-            myByteArray.append(selected.at(i)->text());
-            myByteArray.append("\t");
+            myByteArray.append('\n');
         }
-        else
-        {
-            myByteArray.append(selected.at(i)->text());
-            myByteArray.append("\t");
-        }
-
+        myByteArray.append(selected[i]->text().toUtf8());
+        myByteArray.append('\t');
         row0 = row1;
     }
     myByteArray.remove(myByteArray.length()-1,1);
-
 }
 
 void tableDialog::keyPressEvent(QKeyEvent *event)
@@ -1724,39 +1712,31 @@ void tableDialog::on_exportBox_activated(const QString &arg1)
 
         for(int i = 0; i < currentTable->columnCount();i++)
         {
-            QString string = currentTable->horizontalHeaderItem(i)->text();
-            string.replace("\n",",");
-            myByteArray.append(string);
-            myByteArray.append("\t");
+            QString str = currentTable->horizontalHeaderItem(i)->text();
+            str.replace('\n',',');
+            str.append('\t');
+            myByteArray.append(str.toUtf8());
         }
         myByteArray.remove(myByteArray.length()-1,1);
-        myByteArray.append("\n");
+        myByteArray.append('\n');
 
         int row0 = selected.first()->row();
-        int row1;
-
         for(int i = 0; i < selected.size();i++)
         {
-            row1 = selected.at(i)->row();
+            int row1 = selected[i]->row();
             if(row1 != row0)
             {
                 myByteArray.remove(myByteArray.length()-1,1);
-                myByteArray.append("\n");
-                myByteArray.append(selected.at(i)->text());
-                myByteArray.append("\t");
+                myByteArray.append('\n');
             }
-            else
-            {
-                myByteArray.append(selected.at(i)->text());
-                myByteArray.append("\t");
-            }
-
+            myByteArray.append(selected[i]->text().toUtf8());
+            myByteArray.append('\t');
             row0 = row1;
         }
         myByteArray.remove(myByteArray.length()-1,1);
 
         QMimeData * mimeData = new QMimeData();
-        mimeData->setData("text/plain",myByteArray);
+        mimeData->setData("text/plain", myByteArray);
         QApplication::clipboard()->setMimeData(mimeData);
         qDebug()<<"Table content copied with header!";
         copied = true;
@@ -1774,12 +1754,11 @@ void tableDialog::on_exportBox_activated(const QString &arg1)
     {
         ////preview the current view w/ option button in preview dialog
         QPrinter printer(QPrinter::HighResolution);
-        printer.setPaperSize(QPrinter::A4);
+        printer.setPageSize(QPageSize::A4);
         QPrintPreviewDialog preview(&printer,this);
         preview.setWindowFlags(Qt::Tool);
         connect(&preview,SIGNAL(paintRequested(QPrinter*)),SLOT(printPreview(QPrinter*)));
         preview.exec();
-
     }
     else if(arg1 == "Export to text file")
     {
@@ -1803,33 +1782,25 @@ void tableDialog::on_exportBox_activated(const QString &arg1)
 
             for(int i = 0; i < currentTable->columnCount();i++)
             {
-                QString string = currentTable->horizontalHeaderItem(i)->text();
-                string.replace("\n",",");
-                myByteArray.append(string);
-                myByteArray.append("\t");
+                QString str = currentTable->horizontalHeaderItem(i)->text();
+                str.replace('\n',',');
+                str.append('\t');
+                myByteArray.append(str.toUtf8());
             }
             myByteArray.remove(myByteArray.length()-1,1);
-            myByteArray.append("\n");
+            myByteArray.append('\n');
 
             int row0 = selected.first()->row();
-            int row1;
-
             for(int i = 0; i < selected.size();i++)
             {
-                row1 = selected.at(i)->row();
+                int row1 = selected[i]->row();
                 if(row1 != row0)
                 {
                     myByteArray.remove(myByteArray.length()-1,1);
                     myByteArray.append("\n");
-                    myByteArray.append(selected.at(i)->text());
-                    myByteArray.append("\t");
                 }
-                else
-                {
-                    myByteArray.append(selected.at(i)->text());
-                    myByteArray.append("\t");
-                }
-
+                myByteArray.append(selected[i]->text().toUtf8());
+                myByteArray.append('\t');
                 row0 = row1;
             }
             myByteArray.remove(myByteArray.length()-1,1);
@@ -1844,7 +1815,6 @@ void tableDialog::on_exportBox_activated(const QString &arg1)
                 tstream<<string;
                 tfile.close();
             }
-
         }
         setGeometry(oldGeo);
     }

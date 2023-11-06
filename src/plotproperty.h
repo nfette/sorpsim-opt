@@ -17,28 +17,25 @@
 #ifndef PLOTPROPERTY_H
 #define PLOTPROPERTY_H
 
-#include <qapplication.h>
+#include <cmath>
+#include <unitconvert.h>
+#include <QApplication>
+#include <QList>
+#include <QMultiMap>
 #include <QtGui>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_legend.h>
-#include <cmath>
-#include <qwt_plot_zoomer.h>
-#include <stdlib.h>
-#include <qwt_plot_panner.h>
-#include <unitconvert.h>
-#include <QList>
-#include <qlist.h>
 #include <qwt_scale_draw.h>
 #include <qwt_picker_machine.h>
 #include <qwt_picker.h>
 #include <qwt_legend.h>
-#include <qwt_plot_legenditem.h>
 #include <qwt_plot_grid.h>
+#include <qwt_plot_legenditem.h>
 #include <qwt_plot_marker.h>
-#include <unitconvert.h>
-#include <QMultiMap>
-
+#include <qwt_plot_panner.h>
+#include <qwt_plot_zoomer.h>
+#include <qwt_text.h>
 
 /// Used to represent a state point for drawing an overlay curve
 struct addvalue
@@ -69,7 +66,7 @@ public:
         if ( !points.isEmpty() )
         {
             QString info;/*℃*/
-            info.sprintf( "T_sol=%g C, T_ref=%g C, P=%g kPa",pos.x(),pos.y(),pow(10,(7.05-1596.49/(pos.y()+273.15)-104095.5/pow((pos.y()+273.15),2))));
+            info.asprintf( "T_sol=%g C, T_ref=%g C, P=%g kPa",pos.x(),pos.y(),pow(10,(7.05-1596.49/(pos.y()+273.15)-104095.5/pow((pos.y()+273.15),2))));
             text.setText( info );
         }
         return text;
@@ -94,7 +91,7 @@ public:
         if ( !points.isEmpty() )
         {
             QString info;/*℉*/
-            info.sprintf( "T_sol=%g F, T_ref=%g F, P=%g mm Hg",pos.x(),pos.y(),convert(pow(10,(7.05-1596.49/(convert(pos.y(),temperature[3],temperature[1])+273.15)-104095.5/pow((convert(pos.y(),temperature[3],temperature[1])+273.15),2))),pressure[2],pressure[6]));
+            info.asprintf( "T_sol=%g F, T_ref=%g F, P=%g mm Hg",pos.x(),pos.y(),convert(pow(10,(7.05-1596.49/(convert(pos.y(),temperature[3],temperature[1])+273.15)-104095.5/pow((convert(pos.y(),temperature[3],temperature[1])+273.15),2))),pressure[2],pressure[6]));
             text.setText( info );
         }
         return text;

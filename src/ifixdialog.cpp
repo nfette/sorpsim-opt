@@ -12,22 +12,21 @@
 
 */
 
+#include <QDebug>
+#include <QInputDialog>
+#include <QLineEdit>
+#include <QListView>
+#include <QMessageBox>
+#include <QModelIndex>
+#include <QSet>
+#include <QStringList>
+#include <QStringListModel>
 
 #include "ifixdialog.h"
 #include "ui_ifixdialog.h"
-#include <QListView>
-#include <QStringList>
 #include "mainwindow.h"
 #include "unit.h"
-#include "node.h"
 #include "link.h"
-#include <QStringListModel>
-#include <QDebug>
-#include <QMessageBox>
-#include <QInputDialog>
-#include <QLineEdit>
-#include <QModelIndex>
-#include <QSet>
 #include "dataComm.h"
 #include "vicheckdialog.h"
 
@@ -55,9 +54,7 @@ ifixDialog::ifixDialog(QWidget *parent) :
     ui->removeButton->setDisabled(true);
     ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-
     globalpara.resetIfixes('t');
-
 
     QStringList cbListT;
     QStringList tempListT;
@@ -76,50 +73,38 @@ ifixDialog::ifixDialog(QWidget *parent) :
                 theNode->searchAllSet("t");
                 tList = globalpara.allSet;
 
-                if((theNode->linked&&tList.count()==2&&theNode==theNode->myLinks.toList().first()->myToNode)
+                if((theNode->linked&&tList.count()==2&&theNode==theNode->myLinks.values().first()->myToNode)
                         ||(!theNode->linked&&tList.count()==1)){
 //single point
-                    if(!cbListT.contains("T#"+QString::number(theNode->ndum))){
-                    cbListT.append("T#"+QString::number(theNode->ndum));
-
-                    }
-
+                    if(!cbListT.contains("T#"+QString::number(theNode->ndum)))
+                        cbListT.append("T#"+QString::number(theNode->ndum));
                 }
-                else if(!(theNode->linked&&tList.count()==2&&theNode==theNode->myLinks.toList().first()->myFromNode)){
+                else if(!(theNode->linked&&tList.count()==2&&theNode==theNode->myLinks.values().first()->myFromNode)){
 //in a stream
 
                     tempListT.clear();
                     QList<int> list;
                     for(int i = 0; i < tList.count(); i++){
-                        Node * node = tList.toList().at(i);
-                        if(!list.contains(node->ndum)){
+                        Node * node = tList.values().at(i);
+                        if(!list.contains(node->ndum))
                             list.append(node->ndum);
-                        }
                     }
-                    qSort(list.begin(),list.end());
+                    std::sort(list.begin(),list.end());
 
-                    for(int i = 0; i < list.count(); i++){
+                    for(int i = 0; i < list.count(); i++)
                         tempListT.append(QString::number(list.at(i)));
-                    }
 
-
-                    if(!cbListT.contains("T-Stream: "+tempListT.join(","))){
+                    if(!cbListT.contains("T-Stream: "+tempListT.join(",")))
                         cbListT.append("T-Stream: "+tempListT.join(","));
                 }
-
-                }
-
             }
         }
     }
-
 
     ui->tCB1->addItems(cbListT);
     ui->tCB2->addItems(cbListT);
 
     updateList();
-
-
 }
 
 ifixDialog::~ifixDialog()
@@ -137,12 +122,11 @@ void ifixDialog::updateTempSets()
         QList<QSet<Node*> > newBigSet;
 
         for(int m = 0; m < tempSet.count(); m++){
-            Node* node = tempSet.toList().at(m);
+            Node* node = tempSet.values().at(m);
             bool isIn = false;
             foreach(QSet<Node*> smallSet, newBigSet){
-                if(smallSet.contains(node)){
+                if(smallSet.contains(node))
                     isIn = true;
-                }
             }
             if(!isIn){
                 globalpara.allSet.clear();
@@ -150,7 +134,6 @@ void ifixDialog::updateTempSets()
                 scanSet = globalpara.allSet;
                 newBigSet.append(scanSet);
             }
-
         }
         tSets.append(newBigSet);
     }
@@ -164,23 +147,21 @@ void ifixDialog::updateList()
     groupListT.clear();
     foreach(QList<QSet<Node*> > set,tSets){
         foreach(QSet<Node*> eachSet, set){
-            if(eachSet.count()==1||(eachSet.count()==2&&eachSet.toList().first()->ndum==eachSet.toList().last()->ndum)){
+            if(eachSet.count()==1||(eachSet.count()==2&&eachSet.values().first()->ndum==eachSet.values().last()->ndum)){
                 //for single point
-                groupListT<<"["+QString::number(eachSet.toList().first()->ndum)+"]";
+                groupListT<<"["+QString::number(eachSet.values().first()->ndum)+"]";
             }
             else{
                 //for stream
                 QList<int> list;
                 foreach(Node* node,eachSet){
-                    if(!list.contains(node->ndum)){
+                    if(!list.contains(node->ndum))
                         list<<node->ndum;
-                    }
                 }
-                qSort(list.begin(),list.end());
+                std::sort(list.begin(),list.end());
                 QStringList sList;
-                for(int i = 0; i < list.count();i++){
+                for(int i = 0; i < list.count();i++)
                     sList<<QString::number(list.at(i));
-                }
                 groupListT<<"[";
                 groupListT.append(sList.join(","));
                 groupListT<<"]";
@@ -188,12 +169,10 @@ void ifixDialog::updateList()
 
         }
         QString groups = groupListT.join("");
-        if(!listListT.contains(groups)){
+        if(!listListT.contains(groups))
             listListT.append(groups);
-        }
         groupListT.clear();
     }
-
 
     listModelT = new QStringListModel;
     listModelT->setStringList(listListT);
@@ -373,7 +352,7 @@ void ifixDialog::on_removeButton_clicked()
                 globalpara.allSet.clear();
                 node->searchAllSet("t");
                 QSet<Node*> newSet = globalpara.allSet;
-                if(newSet.count()==1||(newSet.count()==2&&newSet.toList().first()->linked)){
+                if(newSet.count()==1||(newSet.count()==2&&newSet.values().first()->linked)){
                     //a lone point
                 }
                 else{

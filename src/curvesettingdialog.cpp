@@ -14,16 +14,18 @@
 
 */
 
+#include <QDebug>
+#include <QComboBox>
+#include <QLayout>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
+
+#include <qwt_symbol.h>
 
 #include "curvesettingdialog.h"
-#include <qcombobox.h>
-#include <QComboBox>
 #include "ui_curvesettingdialog.h"
-#include <QLayout>
-#include <QDebug>
 #include "mainwindow.h"
 #include "dataComm.h"
-#include <qwt_symbol.h>
 #include "editpropertycurvedialog.h"
 #include "sorputils.h"
 
@@ -41,11 +43,9 @@ curvesetting::curvesetting(QList<QwtPlotCurve *> * curvelist, Plot *plot, QWidge
     mainLayout->setSizeConstraint(QLayout::SetFixedSize);
     setLayout(mainLayout);
 
-
-    QRegExp regExp2("[0-9]+$");
-    QRegExpValidator *pRegExpValidator2 = new QRegExpValidator(regExp2,this);
-    ui->lineEdit_legendcol->setValidator(pRegExpValidator2);
-    ui->lineEdit_legendsize->setValidator(pRegExpValidator2);
+    QRegularExpressionValidator *regExpValidator = new QRegularExpressionValidator(QRegularExpression("[0-9]+$"), this);
+    ui->lineEdit_legendcol->setValidator(regExpValidator);
+    ui->lineEdit_legendsize->setValidator(regExpValidator);
 
 //value set
     curvelistset=curvelist;
@@ -68,54 +68,44 @@ curvesetting::curvesetting(QList<QwtPlotCurve *> * curvelist, Plot *plot, QWidge
         ui->checkBox_legend->setChecked(true);
         ui->radio_Legend2->setChecked(true);
 
-        if (set_plot->internalLegend->alignment()==(Qt::AlignBottom|Qt::AlignLeft))
-        {
+        switch (set_plot->internalLegend->alignmentInCanvas()) {
+        case Qt::AlignBottom |Qt::AlignLeft:
             ui->hAlignmentBox->setCurrentIndex(0);
             ui->vAlignmentBox->setCurrentIndex(2);
-        }
-        else if (set_plot->internalLegend->alignment()==(Qt::AlignVCenter|Qt::AlignLeft))
-        {
+            break;
+        case Qt::AlignVCenter | Qt::AlignLeft:
             ui->hAlignmentBox->setCurrentIndex(0);
             ui->vAlignmentBox->setCurrentIndex(1);
-        }
-        else if (set_plot->internalLegend->alignment()==(Qt::AlignTop | Qt::AlignLeft))
-        {
+            break;
+        case Qt::AlignTop | Qt::AlignLeft:
             ui->hAlignmentBox->setCurrentIndex(0);
             ui->vAlignmentBox->setCurrentIndex(0);
-        }
-        else if (set_plot->internalLegend->alignment()==(Qt::AlignBottom | Qt::AlignHCenter))
-        {
+            break;
+        case Qt::AlignBottom | Qt::AlignHCenter:
             ui->hAlignmentBox->setCurrentIndex(1);
             ui->vAlignmentBox->setCurrentIndex(2);
-        }
-        else if (set_plot->internalLegend->alignment()==(Qt::AlignVCenter | Qt::AlignHCenter))
-        {
+            break;
+        case Qt::AlignVCenter | Qt::AlignHCenter:
             ui->hAlignmentBox->setCurrentIndex(1);
             ui->vAlignmentBox->setCurrentIndex(1);
-        }
-        else if (set_plot->internalLegend->alignment()==(Qt::AlignTop | Qt::AlignHCenter))
-        {
+            break;
+        case Qt::AlignTop | Qt::AlignHCenter:
             ui->hAlignmentBox->setCurrentIndex(1);
             ui->vAlignmentBox->setCurrentIndex(0);
-        }
-        else if (set_plot->internalLegend->alignment()==(Qt::AlignBottom | Qt::AlignRight))
-        {
-
+            break;
+        case Qt::AlignBottom | Qt::AlignRight:
             ui->hAlignmentBox->setCurrentIndex(2);
-
             ui->vAlignmentBox->setCurrentIndex(2);
-        }
-        else if (set_plot->internalLegend->alignment()==(Qt::AlignVCenter | Qt::AlignRight))
-        {
+            break;
+        case Qt::AlignVCenter | Qt::AlignRight:
             ui->hAlignmentBox->setCurrentIndex(2);
             ui->vAlignmentBox->setCurrentIndex(1);
-        }
-        else if (set_plot->internalLegend->alignment()==(Qt::AlignTop | Qt::AlignRight))
-        {
+            break;
+        case Qt::AlignTop|Qt::AlignRight:
             ui->hAlignmentBox->setCurrentIndex(2);
             ui->vAlignmentBox->setCurrentIndex(0);
+            break;
         }
-
         on_checkBox_legend_clicked();
     }
     else
@@ -145,7 +135,6 @@ curvesetting::curvesetting(QList<QwtPlotCurve *> * curvelist, Plot *plot, QWidge
 
     ui->lineEdit_legendcol->setText(col);
 
-
     ui->lineEdit_legendsize->setText(size);
     ui->lineEdit_Title->setText(set_plot->title().text());
     ui->lineEdit_X_axis->setText(set_plot->axisTitle(QwtPlot::xBottom).text());
@@ -170,7 +159,6 @@ curvesetting::curvesetting(QList<QwtPlotCurve *> * curvelist, Plot *plot, QWidge
     }
 
     ui->comboBox_backcolor->setCurrentIndex(ui->comboBox_backcolor->findData(set_plot->canvasBackground().color(), Qt::DecorationRole));
-
 
     connect(ui->comboBox_backcolor,SIGNAL(currentIndexChanged(int)),SLOT(setupmargin()));
     connect(ui->spinBox_major,SIGNAL(valueChanged(int)),SLOT(setupgrid()));
@@ -231,7 +219,7 @@ void curvesetting::on_lineEdit_linetitle_textChanged(const QString &arg1)//set c
         int listIndex = ui->listWidget->currentRow()+bgLineCount;
         QString oldCurveName = curvelistset->at(listIndex)->title().text();
         QString curveName = arg1;
-        if(curveName.count()==0)
+        if(curveName.isEmpty())
             curveName = "curve_"+QString::number(ui->listWidget->currentRow());
         if(curveName.at(0).isDigit())
             curveName = "curve_"+curveName;
@@ -342,7 +330,7 @@ void curvesetting::setuplegend()//legend position settings
             align |= Qt::AlignBottom;
         else
             align |= Qt::AlignVCenter;
-        set_plot->internalLegend->setAlignment( Qt::Alignment(align ) );
+        set_plot->internalLegend->setAlignmentInCanvas(Qt::Alignment(align));
 
         // other setting
         set_plot->internalLegend->setMaxColumns(ui->lineEdit_legendcol->text().toInt());
@@ -351,7 +339,6 @@ void curvesetting::setuplegend()//legend position settings
         set_plot->internalLegend->setFont( font );
     }
     set_plot->replot();
-
 }
 
 void curvesetting::on_radio_Legend1_clicked()//external legend button

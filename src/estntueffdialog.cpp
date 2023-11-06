@@ -14,13 +14,15 @@
 
 */
 
+#include <QDoubleValidator>
+#include <QMessageBox>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
+#include <QValidator>
 
 #include "estntueffdialog.h"
 #include "ui_estntueffdialog.h"
 #include "dehumeffdialog.h"
-#include <QMessageBox>
-#include <QValidator>
-#include <QDoubleValidator>
 #include "mainwindow.h"
 
 extern dehumEffDialog*dhefDialog;
@@ -50,9 +52,7 @@ estNtuEffDialog::estNtuEffDialog(Node *airInlet, QWidget *parent) :
     ui->OKButton->setDisabled(true);
     connect(ui->leCB,SIGNAL(toggled(bool)),ui->leLine,SLOT(setEnabled(bool)));
 
-    QRegExp regExp("[-.0-9]+$");
-    QRegExpValidator *regExpValidator = new QRegExpValidator(regExp,this);
-
+    QRegularExpressionValidator *regExpValidator = new QRegularExpressionValidator(QRegularExpression("[-.0-9]+$"), this);
     ui->maLine->setValidator(regExpValidator);
     ui->hdLine->setValidator(regExpValidator);
     ui->avLine->setValidator(regExpValidator);

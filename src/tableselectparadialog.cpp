@@ -13,7 +13,6 @@
 
 */
 
-
 #include "tableselectparadialog.h"
 #include "ui_tableselectparadialog.h"
 #include "mainwindow.h"
@@ -23,13 +22,14 @@
 #include "unit.h"
 #include "sorputils.h"
 
-#include <QStringList>
-#include <QListView>
 #include <QDebug>
-#include <QMessageBox>
 #include <QLabel>
 #include <QLayout>
+#include <QListView>
+#include <QMessageBox>
+#include <QRegularExpression>
 #include <QStatusBar>
+#include <QStringList>
 
 extern int sceneActionIndex;
 extern bool istableinput;
@@ -72,7 +72,6 @@ tableSelectParaDialog::tableSelectParaDialog(QWidget *parent) :
 
     QLayout *mainLayout = layout();
     mainLayout->setSizeConstraint(QLayout::SetFixedSize);
-
 }
 
 tableSelectParaDialog::~tableSelectParaDialog()
@@ -246,7 +245,6 @@ bool tableSelectParaDialog::setupXml()
 
         }
     }
-
 }
 
 QString tableSelectParaDialog::translateInput(int index, int item)
@@ -329,81 +327,53 @@ QString tableSelectParaDialog::translateOutput(int index, int item)
 
     if(QString(infoTemp.at(0))=="U")
     {
-        switch(item)
-        {
-        case(1):
-        {
+        switch(item) {
+        case 1:
             return "unit";
-        }
-        case(2):
-        {
+        case 2:
             if(!infoTemp.at(2).isDigit())//possibly there are more than 9 units
                 return infoTemp.at(1);
-            else
-                return QString(infoTemp.at(1))+QString(infoTemp.at(2));
-        }
-        case(3):
-        {
+            return QString(infoTemp.at(1))+QString(infoTemp.at(2));
+        case 3:
             if(!infoTemp.at(2).isDigit())
                 return QString(infoTemp.at(2))+QString(infoTemp.at(3));
-            else
-                return QString(infoTemp.at(3))+QString(infoTemp.at(4));
-        }
+            return QString(infoTemp.at(3))+QString(infoTemp.at(4));
         }
     }
     else if(QString(infoTemp.at(0)) == "P")
     {
-        switch(item)
-        {
-        case(1):
-        {
+        switch(item) {
+        case 1:
             return "sp";
-        }
-        case(2):
-        {
+        case 2:
             if(!infoTemp.at(2).isDigit())//in case there're more than 9 units
                 return QString(infoTemp.at(1))+" "+QString(infoTemp.at(3));
             else
                 return QString(infoTemp.at(1))+QString(infoTemp.at(2))+" "+QString(infoTemp.at(4));
-        }
-        case(3):
-        {
+        case 3:
             if(!infoTemp.at(2).isDigit())
                 return infoTemp.at(4);
-            else
-                return infoTemp.at(5);
-        }
+            return infoTemp.at(5);
         }
 
     }
     else if(QString(infoTemp.at(0))=="S")
     {
-        switch(item)
-        {
-        case(1):
-        {
+        switch(item) {
+        case 1:
             return "global";
-        }
-        case(2):
-        {
+        case 2:
             return "0";
-        }
-        case(3):
-        {
+        case 3:
             if(QString(infoTemp.at(1))=="A")
                 return "CAP";
             if(QString(infoTemp.at(1))=="O")
                 return "COP";
         }
-        }
-    }
-    else
-    {
-        return "error";
-        qDebug()<<"error at the"+QString::number(index)+"th entry";
     }
 
-
+    qDebug()<<"error at the"+QString::number(index)+"th entry";
+    return "error";
 }
 
 void tableSelectParaDialog::on_addInputButton_clicked()
@@ -424,8 +394,8 @@ void tableSelectParaDialog::on_OKButton_clicked()
         globalpara.reportError("Please specify at least one input and one output.",this);
     else
     {
-        tableName = ui->tableNamele->text().replace(QRegExp("[^a-zA-Z0-9_]"), "");
-        if(tableName.count()==0)
+        tableName = ui->tableNamele->text().replace(QRegularExpression("[^a-zA-Z0-9_]"), "");
+        if(tableName.isEmpty())
         {
             for(int i = 1;tableNameUsed(tableName);i++)
                 tableName = "table_"+QString::number(i);
@@ -450,7 +420,7 @@ void tableSelectParaDialog::on_OKButton_clicked()
 
 bool tableSelectParaDialog::tableNameUsed(QString name)//true means there has been one
 {
-    if(tableName.count() == 0)
+    if(tableName.isEmpty())
         return true;
     QFile file(globalpara.caseName);
 

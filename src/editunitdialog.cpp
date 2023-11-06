@@ -14,17 +14,17 @@
 
 */
 
+#include <QDebug>
+#include <QDoubleValidator>
+#include <QLayout>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
+#include <QString>
+#include <QValidator>
+
 #include "editunitdialog.h"
 #include "ui_editUnitDialog.h"
-#include "unit.h"
-#include <QString>
-#include <QDebug>
-#include <stdlib.h>
-#include <iostream>
 #include "mainwindow.h"
-#include <QLayout>
-#include <QValidator>
-#include <QDoubleValidator>
 #include "dataComm.h"
 #include "insidelink.h"
 #include "mainwindow.h"
@@ -207,8 +207,8 @@ QDialog(parent),ui(new Ui::editUnitDialog)
             }
         }
     }
-    QRegExp regExp("[-.0-9]+$");
-    QRegExpValidator *regExpValidator = new QRegExpValidator(regExp,this);
+
+    QRegularExpressionValidator *regExpValidator = new QRegularExpressionValidator(QRegularExpression("[-.0-9]+$"), this);
     ui->htLineEdit->setValidator(regExpValidator);
     ui->devgLineEdit->setValidator(regExpValidator);
     ui->devlLineEdit->setValidator(regExpValidator);

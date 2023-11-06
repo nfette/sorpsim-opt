@@ -13,18 +13,25 @@
 
 */
 
+#include <QAction>
+#include <QDomImplementation>
+#include <QLabel>
+#include <QLayout>
+#include <QMessageBox>
+#include <QMenu>
+#include <QPainter>
+#include <QPicture>
+#include <QPrinter>
+#include <QPrintDialog>
+#include <QRegularExpression>
+#include <QToolBar>
+#include <QToolButton>
+#include <QStatusBar>
+#include <QtXml/QDomDocument>
+#include <QtXml>
+#include <QtXml/qdom.h>
+#include <QtXml/QDomDocument>
 
-#include "plotsdialog.h"
-#include "ui_plotsdialog.h"
-#include <qregexp.h>
-#include <qtoolbar.h>
-#include <qtoolbutton.h>
-#include <qlabel.h>
-#include <qlayout.h>
-#include <qstatusbar.h>
-#include <qpicture.h>
-#include <qpainter.h>
-#include <qprintdialog.h>
 #include <qwt_counter.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot_zoomer.h>
@@ -33,20 +40,13 @@
 #include <qwt_symbol.h>
 #include <qwt_text.h>
 #include <qwt_math.h>
-#include <QPrinter>
-#include <qprinter.h>
+
+#include "plotsdialog.h"
+#include "ui_plotsdialog.h"
 #include "curvesettingdialog.h"
 #include "overlaysettingdialog.h"
-#include <QDomImplementation>
-#include <QtXml/QDomDocument>
-#include <QtXml>
-#include <QtXml/qdom.h>
-#include <QtXml/QDomDocument>
 #include "mainwindow.h"
 #include "dataComm.h"
-#include <QMessageBox>
-#include <QMenu>
-#include <QAction>
 #include "myscene.h"
 #include "mainwindow.h"
 #include "newparaplotdialog.h"
@@ -55,7 +55,6 @@
 extern myScene * theScene;
 extern MainWindow * theMainwindow;
 extern globalparameter globalpara;
-
 
 class Zoomer: public QwtPlotZoomer
 {
@@ -390,7 +389,7 @@ bool plotsDialog::loadXml(bool init)
                         internalLegend->setSpacing( 4 );
                         internalLegend->setItemMargin( 2 );
                         internalLegend->setMaxColumns(4);
-                        internalLegend->setAlignment(Qt::AlignBottom|Qt::AlignRight);
+                        internalLegend->setAlignmentInCanvas(Qt::AlignBottom|Qt::AlignRight);
                         extInt = legend.attribute("extInt");
                         if(extInt == "ext")
                         {
@@ -481,7 +480,6 @@ bool plotsDialog::loadXml(bool init)
                     }
                 }
 
-
                 tabs->insertTab(-1,newPlot,currentPlot.attribute("title"));
                 newPlot->replot();
             }
@@ -495,9 +493,7 @@ void plotsDialog::moved(const QPoint &pos)
 {
     Plot* currentPlot = dynamic_cast<Plot*>(tabs->currentWidget());
     QString info;
-    info.sprintf( "X=%g, Y=%g",currentPlot->invTransform(QwtPlot::xBottom,pos.x())
-                  ,currentPlot->invTransform(QwtPlot::yLeft,pos.y()));
-
+    info.asprintf( "X=%g, Y=%g",currentPlot->invTransform(QwtPlot::xBottom,pos.x()),currentPlot->invTransform(QwtPlot::yLeft,pos.y()));
     showInfo( info );
 }
 
@@ -540,12 +536,12 @@ void plotsDialog::print()
     QString docName = currentPlot->title().text();
     if ( !docName.isEmpty() )
     {
-        docName.replace ( QRegExp ( QString::fromLatin1 ( "\n" ) ), tr ( " -- " ) );
+        docName.replace ( QRegularExpression ( QString::fromLatin1 ( "\n" ) ), tr ( " -- " ) );
         printer.setDocName ( docName );
     }
 
     printer.setCreator( currentPlot->title().text());
-    printer.setOrientation( QPrinter::Landscape );
+    printer.setPageOrientation( QPageLayout::Landscape );
 
     QPrintDialog dialog( &printer );
     if ( dialog.exec() )
@@ -658,7 +654,6 @@ void plotsDialog::deleteCurrentPlot()
 
 void plotsDialog::resetZoomer(int i)
 {
-
     Plot* currentPlot = dynamic_cast<Plot*>(tabs->currentWidget());
 
     d_zoomer[0] = new Zoomer( QwtPlot::xBottom, QwtPlot::yLeft,
@@ -672,8 +667,7 @@ void plotsDialog::resetZoomer(int i)
          currentPlot->canvas() );
 
     d_panner = new QwtPlotPanner( currentPlot->canvas() );
-    d_panner->setMouseButton( Qt::MidButton );
-
+    d_panner->setMouseButton( Qt::MiddleButton );
     d_picker = new QwtPlotPicker( QwtPlot::xBottom, QwtPlot::yLeft,
         QwtPlotPicker::CrossRubberBand, QwtPicker::AlwaysOn,
         currentPlot->canvas() );

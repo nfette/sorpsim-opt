@@ -246,12 +246,11 @@ void editPropertyCurveDialog::on_seleCycleButton_clicked()
         theMainwindow->raise();
         QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
     }
-
 }
 
 void editPropertyCurveDialog::on_seleIndexButton_clicked()
 {
-    ui->spIndexLE->text().replace(QRegExp("[^0-9]"), "");
+    ui->spIndexLE->text().replace(QRegularExpression("[^0-9]"), "");
     if (ui->spIndexLE->text().toInt()>spnumber)
     {
         globalpara.reportError("State Point index provided is out of range!");
@@ -260,7 +259,6 @@ void editPropertyCurveDialog::on_seleIndexButton_clicked()
     else addSP(ui->spIndexLE->text().toInt());
 
     ui->spIndexLE->clear();
-
 }
 
 void editPropertyCurveDialog::on_addLoopButton_clicked()
@@ -314,18 +312,14 @@ void editPropertyCurveDialog::on_addLoopButton_clicked()
                             selectedNodes.insert(temp->myNodes[j]);
                             flag=1;
                             break;
-
                         }
                     }
                 }
             }
             if (flag==1) break;
         }
-
     }
-
     displayList();
-
 }
 
 void editPropertyCurveDialog::on_cancelButton_clicked()
@@ -413,7 +407,6 @@ void editPropertyCurveDialog::addSP(int index)
         }
         if (flag==1) break;
     }
-
 }
 
 void editPropertyCurveDialog::keyPressEvent(QKeyEvent *e)
@@ -430,7 +423,6 @@ void editPropertyCurveDialog::updateLoopList()
     Node*node;
     QList<QSet<int> > compareList;
     QList<QList<int> > finalList;
-    QList<int> tempList;
 
     for(int i = 0; i < globalcount;i++)
     {
@@ -441,11 +433,11 @@ void editPropertyCurveDialog::updateLoopList()
             node = iterator->myNodes[j];
             if(globalpara.findNextPtxPoint(node,node))
             {
-                tempList = globalpara.ptxStream;
-                if(!compareList.contains(tempList.toSet())&&tempList.first()==tempList.last()&&tempList.count()>1)
+                QSet<int> tempSet(globalpara.ptxStream.begin(), globalpara.ptxStream.end());
+                if(!compareList.contains(tempSet)&&globalpara.ptxStream.first()==globalpara.ptxStream.last()&&globalpara.ptxStream.count()>1)
                 {
-                    compareList.append(tempList.toSet());
-                    finalList.append(tempList);
+                    compareList.append(tempSet);
+                    finalList.append(globalpara.ptxStream);
                 }
             }
         }
@@ -463,7 +455,6 @@ void editPropertyCurveDialog::updateLoopList()
     }
 }
 
-
 void editPropertyCurveDialog::drawPlot()
 {
     int tInd;
@@ -477,7 +468,6 @@ void editPropertyCurveDialog::drawPlot()
     QwtPlotMarker * marker;
     text.setFont( QFont( "Helvetica", 15, QFont::Bold ) );
     text.setColor(Qt::red);
-
 
     QStringList thePoints;
     QList<QwtPlotMarker *>theMarkers;
@@ -609,7 +599,6 @@ void editPropertyCurveDialog::loadCurrentCurve()
         ui->spList->addItem(spIndex);
         addSP(spIndex.toInt());
     }
-
 }
 
 void editPropertyCurveDialog::on_okButton_clicked()

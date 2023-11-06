@@ -125,7 +125,7 @@ void linkFluidDialog::on_okButton_clicked()
                     sps.append("sp"+QString::number(node->ndum));
                 if(node->linked)
                 {
-                    Link* link = node->myLinks.toList().at(0);
+                    Link* link = node->myLinks.values().first();
                     if(!sps.contains("sp"+QString::number(link->myFromNode->ndum)))
                         sps.append("sp"+QString::number(link->myFromNode->ndum));
                     if(!sps.contains("sp"+QString::number(link->myToNode->ndum)))
@@ -141,7 +141,7 @@ void linkFluidDialog::on_okButton_clicked()
                     sps.append("sp"+QString::number(node->ndum));
                 if(node->linked)
                 {
-                    Link* link = node->myLinks.toList().at(0);
+                    Link* link = node->myLinks.values().first();
                     if(!sps.contains("sp"+QString::number(link->myFromNode->ndum)))
                         sps.append("sp"+QString::number(link->myFromNode->ndum));
                     if(!sps.contains("sp"+QString::number(link->myToNode->ndum)))
@@ -189,7 +189,7 @@ void linkFluidDialog::on_okButton_clicked()
                     sps.append("sp"+QString::number(node->ndum));
                 if(node->linked)
                 {
-                    Link* link = node->myLinks.toList().at(0);
+                    Link* link = node->myLinks.values().first();
                     if(!sps.contains("sp"+QString::number(link->myFromNode->ndum)))
                         sps.append("sp"+QString::number(link->myFromNode->ndum));
                     if(!sps.contains("sp"+QString::number(link->myToNode->ndum)))
@@ -211,7 +211,7 @@ void linkFluidDialog::on_okButton_clicked()
                     sps.append("sp"+QString::number(node->ndum));
                 if(node->linked)
                 {
-                    Link* link = node->myLinks.toList().at(0);
+                    Link* link = node->myLinks.values().first();
                     if(!sps.contains("sp"+QString::number(link->myFromNode->ndum)))
                         sps.append("sp"+QString::number(link->myFromNode->ndum));
                     if(!sps.contains("sp"+QString::number(link->myToNode->ndum)))

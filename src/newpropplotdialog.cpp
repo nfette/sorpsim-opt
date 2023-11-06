@@ -13,11 +13,10 @@
 
 */
 
+#include <QMessageBox>
 
 #include "newpropplotdialog.h"
 #include "ui_newpropplotdialog.h"
-#include "unitconvert.h"
-#include <QMessageBox>
 #include "mainwindow.h"
 
 extern globalparameter globalpara;
@@ -42,8 +41,8 @@ newPropPlotDialog::~newPropPlotDialog()
 
 void newPropPlotDialog::on_okButton_clicked()
 {
-    plotName = ui->nameLine->text().replace(QRegExp("[^a-zA-Z0-9_]"), "");
-    if(plotName.count()==0)
+    plotName = ui->nameLine->text().replace(QRegularExpression("[^a-zA-Z0-9_]"), "");
+    if(plotName.isEmpty())
     {
         for(int i = 1;plotNameUsed(plotName);i++)
             plotName = "plot_"+QString::number(i);
@@ -135,35 +134,31 @@ bool newPropPlotDialog::setupXml()
 
 bool newPropPlotDialog::plotNameUsed(QString name)
 {
-    if(name.count()==0)
+    if(name.isEmpty())
         return true;
-    QFile file(globalpara.caseName);
 
+    QFile file(globalpara.caseName);
     if(!file.open(QIODevice::ReadWrite|QIODevice::Text))
     {
         globalpara.reportError("Fail to open case file to check if the plot name is used.",this);
         return true;
     }
-    else
+
+    QDomDocument doc;
+    if(!doc.setContent(&file))
     {
-        QDomDocument doc;
-        if(!doc.setContent(&file))
-        {
-            globalpara.reportError("Fail to load xml document to check if the plot name is used.",this);
-            file.close();
-            return true;
-        }
-        else
-        {
-            QDomElement plotData = doc.elementsByTagName("plotData").at(0).toElement();
-            QDomNodeList thePlots = plotData.elementsByTagName("plot");
-            QMap<QString, QDomElement> plotsByTitle;
-            for (int i = 0; i < thePlots.length(); i++) {
-                QDomElement iPlot = thePlots.at(i).toElement();
-                plotsByTitle.insert(iPlot.attribute("title"), iPlot);
-            }
-            file.close();
-            return plotsByTitle.contains(name);
-        }
+        globalpara.reportError("Fail to load xml document to check if the plot name is used.",this);
+        file.close();
+        return true;
     }
+
+    QDomElement plotData = doc.elementsByTagName("plotData").at(0).toElement();
+    QDomNodeList thePlots = plotData.elementsByTagName("plot");
+    QMap<QString, QDomElement> plotsByTitle;
+    for (int i = 0; i < thePlots.length(); i++) {
+        QDomElement iPlot = thePlots.at(i).toElement();
+        plotsByTitle.insert(iPlot.attribute("title"), iPlot);
+    }
+    file.close();
+    return plotsByTitle.contains(name);
 }

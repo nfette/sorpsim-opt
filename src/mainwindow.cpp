@@ -65,15 +65,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "treedialog.h"
-#include "node.h"
 #include "link.h"
 #include "myscene.h"
 #include "unit.h"
 #include "globaldialog.h"
-#include "editunitdialog.h"
 #include "myview.h"
 #include "resultdisplaydialog.h"
-#include "selectparadialog.h"
 #include "tableselectparadialog.h"
 #include "tabledialog.h"
 #include "helpdialog.h"
@@ -84,12 +81,9 @@
 #include "masterdialog.h"
 #include "newparaplotdialog.h"
 #include "fluiddialog.h"
-#include "spdialog.h"
 #include "syssettingdialog.h"
 #include "dataComm.h"
 #include "resultdialog.h"
-#include "ldaccompdialog.h"
-#include "sorpsimEngine.h"
 #include "startdialog.h"
 #include "texteditdialog.h"
 #include "vicheckdialog.h"
@@ -472,7 +466,7 @@ void MainWindow::deleteunit(unit *delunit)
 
         if(theNode->linked)
         {
-            Link * link = delunit->myNodes[i]->myLinks.toList().first();
+            Link * link = delunit->myNodes[i]->myLinks.values().first();
             deletelink(link);
         }
     }
@@ -529,7 +523,7 @@ void MainWindow::deleteunit(unit *delunit)
                     if(head->myNodes[j]->linked&head->myNodes[j]->linklowerflag)//if larger in link, update with smaller one
                     {
                         Link * linktemp;
-                        linktemp = head->myNodes[j]->myLinks.toList().first();
+                        linktemp = head->myNodes[j]->myLinks.values().first();
                         Node * sp3 = linktemp->myFromNode;
                         Node * sp4 = linktemp->myToNode;
                         Node * Ntemp;
@@ -642,7 +636,7 @@ void MainWindow::deletelink(Link *dellink)
                 else if(head->myNodes[j]->linked &(head->myNodes[j]->linklowerflag))//linked and is the larger one, update according to the smaller one
                 {
                     Link * linktemp;
-                    linktemp = head->myNodes[j]->myLinks.toList().first();
+                    linktemp = head->myNodes[j]->myLinks.values().first();
                     Node * sp3 = linktemp->myFromNode;
                     Node * sp4 = linktemp->myToNode;
                     if(sp3->unitindex > sp4->unitindex)
@@ -1236,8 +1230,8 @@ bool MainWindow::loadCase(QString name)
             Node*node1,*node2;
             foreach(QSet<Node*> set,linkList)
             {
-                node1 = set.toList().first();
-                node2 = set.toList().last();
+                node1 = set.values().first();
+                node2 = set.values().last();
                 scene->drawLink(node1,node2);
             }
 
@@ -1287,7 +1281,7 @@ bool MainWindow::loadCase(QString name)
                         sensor->icfix = 0;
                         sensor->ipfix = 0;
                         sensor->iwfix = 0;
-                        sensor->ksub = globalpara.fluids.toList().first();
+                        sensor->ksub = globalpara.fluids.values().first();
                     }
                 }
             }
@@ -1388,7 +1382,7 @@ bool MainWindow::preprocessOutFile(QString fileName)
         do
         {
             line = istream.readLine();
-            out<<line<<endl;
+            out<<line<<Qt::endl;
         }while(!line.contains("NO. OF STATE"));
         line.replace("NO. OF STATE POINTS:","");
         spCount = line.toInt();
@@ -1397,7 +1391,7 @@ bool MainWindow::preprocessOutFile(QString fileName)
         do
         {
             line = istream.readLine();
-            out<<line<<endl;
+            out<<line<<Qt::endl;
         }while(!line.contains("STARTING"));
 
         //load state points
@@ -1407,7 +1401,7 @@ bool MainWindow::preprocessOutFile(QString fileName)
         for(int h = 0; h < spCount; h++)//record the indexes and values from sp data
         {
             line = istream.readLine();
-            list = line.split(" ",QString::SkipEmptyParts);
+            list = line.split(" ",Qt::SkipEmptyParts);
 
             ksub.append(list[1]);
             itfix.append(list[2]);
@@ -1420,7 +1414,6 @@ bool MainWindow::preprocessOutFile(QString fileName)
             p.append(list[9]);
             iwfix.append(list[10]);
             w.append(list[11]);
-
         }
         //sort in groups and re-define indexes
         QMultiMap<QString,int> tmap,fmap,cmap,pmap,wmap;
@@ -1517,13 +1510,13 @@ bool MainWindow::preprocessOutFile(QString fileName)
             out << qSetFieldWidth(3) << ipfix.at(h);
             out << qSetFieldWidth(11) << p.at(h);
             out << qSetFieldWidth(3) << iwfix.at(h);
-            out << qSetFieldWidth(11) << w.at(h) << endl;
+            out << qSetFieldWidth(11) << w.at(h) << Qt::endl;
         }
 
         do
         {
             line = istream.readLine();
-            out<<line<<endl;
+            out<<line<<Qt::endl;
         }while(!istream.atEnd());
 
         istream.flush();
@@ -1582,7 +1575,7 @@ bool MainWindow::loadOutFile()
                 line.replace("FMAX=","");
                 line.replace("PMAX=","");
                 line.replace("D","e");
-                list = line.split(" ",QString::SkipEmptyParts);
+                list = line.split(" ",Qt::SkipEmptyParts);
                 globalpara.tmax = list[0].toDouble();
                 globalpara.tmin = list[1].toDouble();
                 globalpara.fmax = list[2].toDouble();
@@ -1625,7 +1618,7 @@ bool MainWindow::loadOutFile()
                 while(!line.contains("TOLERANCES"));
                 line.replace("TOLERANCES IN F, X :","");
                 line.replace("D","e");
-                list=line.split(" ",QString::SkipEmptyParts);
+                list=line.split(" ",Qt::SkipEmptyParts);
                 globalpara.ftol = list[0].toDouble();
                 globalpara.xtol = list[1].toDouble();
 
@@ -1657,7 +1650,7 @@ bool MainWindow::loadOutFile()
                 {
                     line = stream.readLine();
                     line.replace("D","e");
-                    list = line.split(" ",QString::SkipEmptyParts);
+                    list = line.split(" ",Qt::SkipEmptyParts);
                     line = list[2];
                     splitList = line.split(" ");
                     loadUnit = new unit;
@@ -1683,7 +1676,7 @@ bool MainWindow::loadOutFile()
                     loadUnit->initialize();
 
                     line = stream.readLine();
-                    list = line.split("  ",QString::SkipEmptyParts);
+                    list = line.split("  ",Qt::SkipEmptyParts);
                     for(int j = 0;j<7;j++)
                     {
                         sps[i][j] = list[j].toInt();
@@ -1737,7 +1730,7 @@ bool MainWindow::loadOutFile()
                 {
                     line = stream.readLine();
                     line.replace("D","e");
-                    list = line.split(" ",QString::SkipEmptyParts);
+                    list = line.split(" ",Qt::SkipEmptyParts);
 
                     ksub[h] = list[1].toInt();
                     itfix[h] = list[2].toInt();
@@ -1793,7 +1786,7 @@ bool MainWindow::loadOutFile()
                 {
                     line = stream.readLine();
                     line.replace("D","e");
-                    list = line.split(" ",QString::SkipEmptyParts);
+                    list = line.split(" ",Qt::SkipEmptyParts);
 
                     tr[h] = list[1].toDouble();
                     hr[h] = list[2].toDouble();
@@ -1801,7 +1794,6 @@ bool MainWindow::loadOutFile()
                     cr[h] = list[4].toDouble();
                     pr[h] = list[5].toDouble();
                     wr[h] = list[6].toDouble();
-
                 }
 
                 iterator=dummy;
@@ -1829,7 +1821,7 @@ bool MainWindow::loadOutFile()
                 if(line.contains("COP")){
 
                     line.replace("D","e");
-                    list = line.split(" ",QString::SkipEmptyParts);
+                    list = line.split(" ",Qt::SkipEmptyParts);
                     globalpara.cop = list[2].toDouble();
                     globalpara.capacity = list[5].toDouble();
                 }
@@ -1926,7 +1918,7 @@ bool MainWindow::loadOutFile()
                                                 sensor->icfix = 0;
                                                 sensor->ipfix = 0;
                                                 sensor->iwfix = 0;
-                                                sensor->ksub = globalpara.fluids.toList().first();
+                                                sensor->ksub = globalpara.fluids.values().first();
 //                                                qDebug()<<sensor->ndum<<"sensor restored";
                                             }
 
@@ -2026,7 +2018,7 @@ void MainWindow::createGroupFromIfix()
                 needNew = true;
                 foreach(QSet<Node*> tset,globalpara.tGroup)
                 {
-                    Node * tempNode = tset.toList().first();
+                    Node * tempNode = tset.values().first();
                     if(iterator->myNodes[j]->itfix == tempNode->itfix)
                     {
                         globalpara.tGroup.removeOne(tset);
@@ -2055,7 +2047,7 @@ void MainWindow::createGroupFromIfix()
                 needNew = true;
                 foreach(QSet<Node*> fset,globalpara.fGroup)
                 {
-                    Node * tempNode = fset.toList().first();
+                    Node * tempNode = fset.values().first();
                     if(iterator->myNodes[j]->iffix == tempNode->iffix)
                     {
                         globalpara.fGroup.removeOne(fset);
@@ -2080,7 +2072,7 @@ void MainWindow::createGroupFromIfix()
                 needNew = true;
                 foreach(QSet<Node*> cset,globalpara.cGroup)
                 {
-                    Node * tempNode = cset.toList().first();
+                    Node * tempNode = cset.values().first();
                     if(iterator->myNodes[j]->icfix == tempNode->icfix)
                     {
                         globalpara.cGroup.removeOne(cset);
@@ -2105,7 +2097,7 @@ void MainWindow::createGroupFromIfix()
                 needNew = true;
                 foreach(QSet<Node*> wset,globalpara.wGroup)
                 {
-                    Node * tempNode = wset.toList().first();
+                    Node * tempNode = wset.values().first();
                     if(iterator->myNodes[j]->iwfix == tempNode->iwfix)
                     {
                         globalpara.wGroup.removeOne(wset);
@@ -2363,7 +2355,7 @@ bool MainWindow::noChangeMade()
                     Link*link;
                     if(loadingUnit->myNodes[j]->linked)
                     {
-                        link = loadingUnit->myNodes[j]->myLinks.toList().first();
+                        link = loadingUnit->myNodes[j]->myLinks.values().first();
 
                         if(loadingUnit->myNodes[j] == link->myFromNode)
                         {
@@ -3347,7 +3339,7 @@ void MainWindow::saveFile(QString fileName, bool overwrite)
 
                     if(head->myNodes[i]->linked)
                     {
-                        link = head->myNodes[i]->myLinks.toList().first();
+                        link = head->myNodes[i]->myLinks.values().first();
 
                         if(head->myNodes[i] == link->myFromNode)
                         {
@@ -3379,20 +3371,13 @@ void MainWindow::saveFile(QString fileName, bool overwrite)
                 caseData.removeChild(caseData.elementsByTagName("Unit"+QString::number(j+1)).at(0));
                 caseData.appendChild(unitData);
             }
-
-
-
         }
-
-
     }
        //end of CaseData
     file.resize(0);
     stream.setDevice(&file);
     doc.save(stream,4);
     file.close();
-    return;
-
 }
 
 void MainWindow::on_actionSave_As_triggered()
@@ -3512,7 +3497,7 @@ void MainWindow::on_actionPrint_triggered()
 
     ////preview the current view w/ option button in preview dialog
     QPrinter printer(QPrinter::HighResolution);
-    printer.setPaperSize(QPrinter::A4);
+    printer.setPageSize(QPageSize::A4);
     QPrintPreviewDialog preview(&printer,this);
     connect(&preview,SIGNAL(paintRequested(QPrinter*)),SLOT(printPreview(QPrinter*)));
     preview.exec();
@@ -3638,10 +3623,8 @@ void MainWindow::resultShow()
                 showRes = false;//to just show one result for two linked state points
                 if(iterator->myNodes[i]->linked)
                 {
-                    if(iterator->myNodes[i]==iterator->myNodes[i]->myLinks.toList().first()->myFromNode)
-                    {
+                    if(iterator->myNodes[i]==iterator->myNodes[i]->myLinks.values().first()->myFromNode)
                         showRes = true;
-                    }
                     else
                         showRes = false;
                 }
@@ -4138,16 +4121,14 @@ void MainWindow::on_actionExport_to_File_triggered()
     //    ratio = 1+ (1-maxDim/900);
         ratio = 1.1;
 
-
         QPrinter myPrinter(QPrinter::ScreenResolution);
-        myPrinter.setOrientation(QPrinter::Landscape);
-        myPrinter.setPaperSize(QPrinter::A4);
+        myPrinter.setPageOrientation(QPageLayout::Landscape);
+        myPrinter.setPageSize(QPageSize::A4);
         int m_pageWidth = myPrinter.width();
         int m_pageHeight = myPrinter.height();
 
         QRectF source = QRect(QPoint(ratio*xmin-100,ratio*ymin-100),QPoint(ratio*xmax+100,ratio*ymax+100));
         QRectF target = QRect(QPoint(0,0),QPoint(m_pageWidth,m_pageHeight));
-
 
         if (suffix == "pdf")
         {
@@ -4159,7 +4140,6 @@ void MainWindow::on_actionExport_to_File_triggered()
             myPainter.setRenderHint(QPainter::Antialiasing);
             scene->render(&myPainter, target, source);
             myPainter.end();
-
         }
         else if (suffix == "png")
         {
@@ -4176,8 +4156,6 @@ void MainWindow::on_actionExport_to_File_triggered()
             qDebug() << "Unimplemented export file type (" << suffix << ") in: " << fileName;
         }
     }
-
-
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)

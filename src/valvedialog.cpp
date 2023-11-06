@@ -12,16 +12,17 @@
 
 */
 
-#include "valvedialog.h"
-#include "ui_valvedialog.h"
-#include "mainwindow.h"
-#include "dataComm.h"
+#include <QDoubleValidator>
 #include <QLayout>
 #include <QMessageBox>
-#include "unit.h"
-#include "node.h"
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <QValidator>
-#include <QDoubleValidator>
+
+#include "dataComm.h"
+#include "mainwindow.h"
+#include "ui_valvedialog.h"
+#include "valvedialog.h"
 
 extern globalparameter globalpara;
 extern unit*dummy;
@@ -58,7 +59,6 @@ valveDialog::valveDialog(unit *theValve, bool first, QWidget *parent) :
             ui->sensorBox->insertItem(0,"N/A");
     }
 
-
     if(!first)
     {
         ui->coefLine->setText(QString::number(myUnit->ht,'g',4));
@@ -80,10 +80,7 @@ valveDialog::valveDialog(unit *theValve, bool first, QWidget *parent) :
     QLayout *mainLayout = layout();
     mainLayout->setSizeConstraint(QLayout::SetFixedSize);
 
-
-    QRegExp regExp("[-.0-9]+$");
-    QRegExpValidator *regExpValidator = new QRegExpValidator(regExp,this);
-
+    QRegularExpressionValidator *regExpValidator = new QRegularExpressionValidator(QRegularExpression("[-.0-9]+$"), this);
     ui->coefLine->setValidator(regExpValidator);
     ui->lawLine->setValidator(regExpValidator);
     ui->temperatureLine->setValidator(regExpValidator);
@@ -132,8 +129,7 @@ void valveDialog::on_okButton_clicked()
             myUnit->myNodes[2]->icfix = 0;
             myUnit->myNodes[2]->ipfix = 0;
             myUnit->myNodes[2]->iwfix = 0;
-            myUnit->myNodes[2]->ksub = globalpara.fluids.toList().first();
-
+            myUnit->myNodes[2]->ksub = globalpara.fluids.values().first();
         }
     }
     accept();

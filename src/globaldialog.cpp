@@ -13,15 +13,16 @@
 
 */
 
+#include <QDoubleValidator>
+#include <QLayout>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
+#include <QValidator>
 
+#include "dataComm.h"
 #include "globaldialog.h"
 #include "ui_globaldialog.h"
 #include "mainwindow.h"
-#include "node.h"
-#include <QLayout>
-#include "dataComm.h"
-#include <QValidator>
-#include <QDoubleValidator>
 
 extern globalparameter globalpara;
 extern MainWindow*theMainwindow;
@@ -42,9 +43,8 @@ GlobalDialog::GlobalDialog(QWidget *parent) :
 
     QLayout *mainLayout = layout();
     mainLayout->setSizeConstraint(QLayout::SetFixedSize);
-    QRegExp regExp("[-.0-9]+$");
-    QRegExpValidator *regExpValidator = new QRegExpValidator(regExp,this);
 
+    QRegularExpressionValidator *regExpValidator = new QRegularExpressionValidator(QRegularExpression("[-.0-9]+$"), this);
     ui->convtolerancef->setValidator(regExpValidator);
     ui->convtolerancev->setValidator(regExpValidator);
 }
@@ -62,7 +62,6 @@ void GlobalDialog::on_buttonBox_accepted()
    globalpara.ftol = ui->convtolerancef->text().toDouble();
    globalpara.xtol = ui->convtolerancev->text().toDouble();
    accept();
-
 }
 
 void GlobalDialog::on_buttonBox_rejected()

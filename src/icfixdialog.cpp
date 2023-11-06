@@ -13,22 +13,21 @@
 
 */
 
+#include <QDebug>
+#include <QInputDialog>
+#include <QLineEdit>
+#include <QListView>
+#include <QMessageBox>
+#include <QModelIndex>
+#include <QSet>
+#include <QStringList>
+#include <QStringListModel>
 
 #include "icfixdialog.h"
 #include "ui_icfixdialog.h"
-#include <QListView>
-#include <QStringList>
 #include "mainwindow.h"
 #include "unit.h"
-#include "node.h"
 #include "link.h"
-#include <QStringListModel>
-#include <QDebug>
-#include <QMessageBox>
-#include <QInputDialog>
-#include <QLineEdit>
-#include <QModelIndex>
-#include <QSet>
 #include "dataComm.h"
 #include "vicheckdialog.h"
 
@@ -76,38 +75,30 @@ icfixDialog::icfixDialog(QWidget *parent) :
                 theNode->searchAllSet("c");
                 cList = globalpara.allSet;
 
-                if((theNode->linked&&cList.count()==2&&theNode==theNode->myLinks.toList().first()->myToNode)
+                if((theNode->linked&&cList.count()==2&&theNode==theNode->myLinks.values().first()->myToNode)
                         ||(!theNode->linked&&cList.count()==1)){
 //single point
-                    if(!cbListC.contains("C#"+QString::number(theNode->ndum))){
-                    cbListC.append("C#"+QString::number(theNode->ndum));
-
-                    }
+                    if(!cbListC.contains("C#"+QString::number(theNode->ndum)))
+                        cbListC.append("C#"+QString::number(theNode->ndum));
 
                 }
-                else if(!(theNode->linked&&cList.count()==2&&theNode==theNode->myLinks.toList().first()->myFromNode)){
+                else if(!(theNode->linked&&cList.count()==2&&theNode==theNode->myLinks.values().first()->myFromNode)){
 //in a stream
                     tempListC.clear();
                     QList<int> list;
                     for(int i = 0; i < cList.count(); i++){
-                        Node * node = cList.toList().at(i);
-                        if(!list.contains(node->ndum)){
+                        Node * node = cList.values().at(i);
+                        if(!list.contains(node->ndum))
                             list.append(node->ndum);
-                        }
                     }
-                    qSort(list.begin(),list.end());
+                    std::sort(list.begin(),list.end());
 
-                    for(int i = 0; i < list.count(); i++){
+                    for(int i = 0; i < list.count(); i++)
                         tempListC.append(QString::number(list.at(i)));
-                    }
 
-
-                    if(!cbListC.contains("C-Stream: "+tempListC.join(","))){
+                    if(!cbListC.contains("C-Stream: "+tempListC.join(",")))
                         cbListC.append("C-Stream: "+tempListC.join(","));
                 }
-
-                }
-
             }
         }
     }
@@ -116,7 +107,6 @@ icfixDialog::icfixDialog(QWidget *parent) :
     ui->tCB2->addItems(cbListC);
 
     updateList();
-
 }
 
 icfixDialog::~icfixDialog()
@@ -134,12 +124,11 @@ void icfixDialog::updateTempSets()
         QList<QSet<Node*> > newBigSet;
 
         for(int m = 0; m < tempSet.count(); m++){
-            Node* node = tempSet.toList().at(m);
+            Node* node = tempSet.values().at(m);
             bool isIn = false;
             foreach(QSet<Node*> smallSet, newBigSet){
-                if(smallSet.contains(node)){
+                if(smallSet.contains(node))
                     isIn = true;
-                }
             }
             if(!isIn){
                 globalpara.allSet.clear();
@@ -147,7 +136,6 @@ void icfixDialog::updateTempSets()
                 scanSet = globalpara.allSet;
                 newBigSet.append(scanSet);
             }
-
         }
         cSets.append(newBigSet);
     }
@@ -161,33 +149,29 @@ void icfixDialog::updateList()
     groupListC.clear();
     foreach(QList<QSet<Node*> > set,cSets){
         foreach(QSet<Node*> eachSet, set){
-            if(eachSet.count()==1||(eachSet.count()==2&&eachSet.toList().first()->ndum==eachSet.toList().last()->ndum)){
+            if(eachSet.count()==1||(eachSet.count()==2&&eachSet.values().first()->ndum==eachSet.values().last()->ndum)){
                 //for single point
-                groupListC<<"["+QString::number(eachSet.toList().first()->ndum)+"]";
+                groupListC<<"["+QString::number(eachSet.values().first()->ndum)+"]";
             }
             else{
                 //for stream
                 QList<int> list;
                 foreach(Node* node,eachSet){
-                    if(!list.contains(node->ndum)){
+                    if(!list.contains(node->ndum))
                         list<<node->ndum;
-                    }
                 }
-                qSort(list.begin(),list.end());
+                std::sort(list.begin(),list.end());
                 QStringList sList;
-                for(int i = 0; i < list.count();i++){
+                for(int i = 0; i < list.count();i++)
                     sList<<QString::number(list.at(i));
-                }
                 groupListC<<"[";
                 groupListC.append(sList.join(","));
                 groupListC<<"]";
             }
-
         }
         QString groups = groupListC.join("");
-        if(!listListC.contains(groups)){
+        if(!listListC.contains(groups))
             listListC.append(groups);
-        }
         groupListC.clear();
     }
 
@@ -365,7 +349,7 @@ void icfixDialog::on_removeButton_clicked()
                 globalpara.allSet.clear();
                 node->searchAllSet("c");
                 QSet<Node*> newSet = globalpara.allSet;
-                if(newSet.count()==1||(newSet.count()==2&&newSet.toList().first()->linked)){
+                if(newSet.count()==1||(newSet.count()==2&&newSet.values().first()->linked)){
                     //a lone point
                 }
                 else{
@@ -379,15 +363,12 @@ void icfixDialog::on_removeButton_clicked()
     ui->modifyButton->setDisabled(true);
     ui->removeButton->setDisabled(true);
     updateList();
-
 }
-
 
 void icfixDialog::on_okButton_clicked()
 {
     close();
 }
-
 
 void icfixDialog::on_modifyButton_clicked()
 {
@@ -444,20 +425,13 @@ void icfixDialog::on_modifyButton_clicked()
             else{
                 globalpara.addGroup('c',set1);
             }
-
-
-
-
         }
-
     }
-
 
     globalpara.resetIfixes('c');
     updateList();
     ui->modifyButton->setDisabled(true);
     ui->removeButton->setDisabled(true);
-
 }
 
 void icfixDialog::on_listView_clicked(const QModelIndex &index)

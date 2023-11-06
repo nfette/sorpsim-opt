@@ -13,12 +13,10 @@
 
 */
 
-
 #include "masterdialog.h"
 #include "ui_masterdialog.h"
 #include "mainwindow.h"
 #include "unit.h"
-#include "node.h"
 #include "masterpanelcell.h"
 #include "guessdialog.h"
 #include "dataComm.h"
@@ -31,7 +29,6 @@
 #include <QLineEdit>
 #include <QLayout>
 #include <QDebug>
-#include <QDesktopWidget>
 #include <QMessageBox>
 #include <QPrintDialog>
 
@@ -551,7 +548,7 @@ void masterDialog::enforceValueChanges(Node *node, QString paraName, double valu
         if(node->linked)
         {
             Node*node1 = node,*node2;
-            Link*link = node->myLinks.toList().at(0);
+            Link*link = node->myLinks.values().first();
             node2=link->myFromNode;
             if(link->myFromNode==node)
                 node2 = link->myToNode;
@@ -654,7 +651,7 @@ void masterDialog::enforceIndexChanges(Node *node, QString paraName, int index)
     if(node->linked)
     {
         Node*node1 = node,*node2;
-        Link*link = node->myLinks.toList().at(0);
+        Link*link = node->myLinks.values().first();
         node2=link->myFromNode;
         if(link->myFromNode==node)
             node2 = link->myToNode;

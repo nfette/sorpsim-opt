@@ -14,18 +14,18 @@
 
 */
 
+#include <QDoubleValidator>
+#include <QDoubleSpinBox>
+#include <QLayout>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
+#include <QString>
+#include <QValidator>
 
 #include "ldaccompdialog.h"
 #include "ui_ldaccompdialog.h"
-#include "unit.h"
-#include <QString>
-#include "globaldialog.h"
 #include "mainwindow.h"
-#include <QDoubleSpinBox>
 #include "ntuestimatedialog.h"
-#include <QLayout>
-#include <QValidator>
-#include <QDoubleValidator>
 
 extern MainWindow*theMainwindow;
 LDACcompDialog*ldacDialog;
@@ -78,7 +78,6 @@ LDACcompDialog::LDACcompDialog(unit* unit, QWidget *parent) :
     }
     }
 
-
     switch(myUnit->icop)
     {
     case(-1):
@@ -103,16 +102,12 @@ LDACcompDialog::LDACcompDialog(unit* unit, QWidget *parent) :
 
     ui->NTUestLabel->setText("");
 
-    QValidator *inputRange = new QDoubleValidator(0,1,2,this);
-
-    QRegExp regExp("[-.0-9]+$");
-    QRegExpValidator *regExpValidator = new QRegExpValidator(regExp,this);
-
+    QValidator *inputRange = new QDoubleValidator(0, 1, 2, this);
+    QRegularExpressionValidator *regExpValidator = new QRegularExpressionValidator(QRegularExpression("[-.0-9]+$"), this);
     ui->wetLine->setValidator(inputRange);
     ui->NTUaLine->setValidator(regExpValidator);
     ui->NTUmLine->setValidator(regExpValidator);
     ui->NTUwLine->setValidator(regExpValidator);
-
 }
 
 LDACcompDialog::~LDACcompDialog()
