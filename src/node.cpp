@@ -13,9 +13,6 @@
 
 */
 
-
-#include "node.h"
-#include "link.h"
 #include <QApplication>
 #include <QStyle>
 #include <QStyleOptionGraphicsItem>
@@ -29,7 +26,9 @@
 #include <QDebug>
 #include <QSet>
 #include <QGraphicsSimpleTextItem>
-#include "mainwindow.h"
+
+#include "node.h"
+#include "link.h"
 #include "dataComm.h"
 
 extern globalparameter globalpara;
@@ -53,7 +52,6 @@ Node::Node()
     text->setPen(tpen);
     isHighlighted = false;
     linklowerflag = false;
-
 }
 
 Node::~Node()
@@ -64,10 +62,10 @@ Node::~Node()
 
 void Node::addLink(Link *link)
 {
-    if(linked == false)
+    if(!linked)
     {
-    myLinks.insert(link);
-    linked = true;
+        myLinks.insert(link);
+        linked = true;
     }
 }
 
@@ -128,8 +126,6 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     painter->setBrush(myBackgroundColor);
 
     painter->drawRect(rect);
-
-
 }
 
 void Node::setHighlighted(bool isHigh)
@@ -333,9 +329,7 @@ void Node::setColor()
 void Node::showFluid(bool toShow)
 {
     if(toShow)
-    {
         myUnit->spParameter[localindex-1]->setText("["+QString::number(ndum)+"]"+globalpara.fluidInventory[ksub].split(",").first());
-    }
     else
         myUnit->spParameter[localindex-1]->setText("");
 }
@@ -377,7 +371,6 @@ void Node::addToSet(Node *node, QString type)
         if(!FluidSet.contains(node))
             FluidSet.insert(node);
     }
-
 }
 
 QSet<Node *> Node::returnSet(QString type)
@@ -386,11 +379,11 @@ QSet<Node *> Node::returnSet(QString type)
         return FSet;
     if(type=="fc")
         return FCSet;
-    else if(type=="p")
+    if(type=="p")
         return PSet;
-    else if(type=="c")
+    if(type=="c")
         return CSet;
-    else if(type=="t")
+    if(type=="t")
         return TSet;
     if(type=="w")
         return WSet;
@@ -400,140 +393,125 @@ QSet<Node *> Node::returnSet(QString type)
 
 bool Node::searchAllSet(QString type,bool searchCloseLoop)
 {
-    if(isinside&&insideLinked)
+    if (isinside && insideLinked)
     {
-        insideLink*link = myInsideLink;
-        Node*outNode = link->regularNode();
+        insideLink *link = myInsideLink;
+        Node *outNode = link->regularNode();
         outNode->searchAllSet(type,searchCloseLoop);
         globalpara.allSet.insert(this);
-    }
-    else
-    {
-        if(type=="fc"&&searchCloseLoop)
-        {
-            bool closed = true;
-            QSet<Node*>fcTempSet;
-            fcTempSet.unite(FCSet);
-            fcTempSet.insert(this);
-            foreach(Node* node,fcTempSet)
-            {
-                if(!globalpara.allSet.contains(node))
-                {
-                    globalpara.allSet.insert(node);
-                    if(node->linked)
-                    {
-                        closed=closed&&addLinkedSet(node,"fc",true,this);
-                    }
-                    else return false;
-                }
-            }
-            return closed;
-        }
-
-        if(type=="f")
-        {
-            QSet<Node*>fTempSet;
-            fTempSet.unite(FSet);
-            fTempSet.insert(this);
-            foreach(Node* node,fTempSet)
-            {
-                if(!globalpara.allSet.contains(node))
-                {
-                    globalpara.allSet.insert(node);
-                    if(node->linked)
-                    {
-                        addLinkedSet(node,"f");
-                    }
-                }
-            }
-        }
-        if(type=="t")
-        {
-            QSet<Node*>tTempSet;
-            tTempSet.unite(TSet);
-            tTempSet.insert(this);
-            foreach(Node* node,tTempSet)
-            {
-                if(!globalpara.allSet.contains(node))
-                {
-                    globalpara.allSet.insert(node);
-                    if(node->linked)
-                    {
-                        addLinkedSet(node,"t");
-                    }
-                }
-            }
-        }
-        if(type=="c")
-        {
-            QSet<Node*>cTempSet;
-            cTempSet.unite(CSet);
-            cTempSet.insert(this);
-            foreach(Node* node,cTempSet)
-            {
-                if(!globalpara.allSet.contains(node))
-                {
-                    globalpara.allSet.insert(node);
-                    if(node->linked)
-                    {
-                        addLinkedSet(node,"c");
-                    }
-                }
-            }
-        }
-        if(type=="p")
-        {
-            QSet<Node*>pTempSet;
-            pTempSet.unite(PSet);
-            pTempSet.insert(this);
-            foreach(Node* node,pTempSet)
-            {
-                if(!globalpara.allSet.contains(node))
-                {
-                    globalpara.allSet.insert(node);
-                    if(node->linked)
-                    {
-                        addLinkedSet(node,"p");
-                    }
-                }
-            }
-        }
-        if(type=="w")
-        {
-            QSet<Node*>wTempSet;
-            wTempSet.unite(WSet);
-            wTempSet.insert(this);
-            foreach(Node* node,wTempSet)
-            {
-                if(!globalpara.allSet.contains(node))
-                {
-                    globalpara.allSet.insert(node);
-                    if(node->linked)
-                    {
-                        addLinkedSet(node,"w");
-                    }
-                }
-            }
-        }
-        if(type=="fluid")
-        {
-            QSet<Node*>fluidTempSet;
-            fluidTempSet.unite(FluidSet);
-            fluidTempSet.insert(this);
-            foreach(Node* node,fluidTempSet)
-            {
-                if(!globalpara.allSet.contains(node))
-                {
-                    globalpara.allSet.insert(node);
-                    if(node->linked)
-                    {
-                        addLinkedSet(node,"fluid");
-                    }
-                }
-            }
-        }
         return false;
     }
+
+    if (type=="fc" && searchCloseLoop)
+    {
+        bool closed = true;
+        QSet<Node*>fcTempSet;
+        fcTempSet.unite(FCSet);
+        fcTempSet.insert(this);
+        foreach(Node* node,fcTempSet)
+        {
+            if(!globalpara.allSet.contains(node))
+            {
+                globalpara.allSet.insert(node);
+                if(node->linked)
+                    closed=closed&&addLinkedSet(node,"fc",true,this);
+                else
+                    return false;
+            }
+        }
+        return closed;
+    }
+    if (type=="f")
+    {
+        QSet<Node*>fTempSet;
+        fTempSet.unite(FSet);
+        fTempSet.insert(this);
+        foreach(Node* node,fTempSet)
+        {
+            if(!globalpara.allSet.contains(node))
+            {
+                globalpara.allSet.insert(node);
+                if(node->linked)
+                    addLinkedSet(node,"f");
+            }
+        }
+    }
+    if(type=="t")
+    {
+        QSet<Node*>tTempSet;
+        tTempSet.unite(TSet);
+        tTempSet.insert(this);
+        foreach(Node* node,tTempSet)
+        {
+            if(!globalpara.allSet.contains(node))
+            {
+                globalpara.allSet.insert(node);
+                if(node->linked)
+                    addLinkedSet(node,"t");
+            }
+        }
+    }
+    if(type=="c")
+    {
+        QSet<Node*>cTempSet;
+        cTempSet.unite(CSet);
+        cTempSet.insert(this);
+        foreach(Node* node,cTempSet)
+        {
+            if(!globalpara.allSet.contains(node))
+            {
+                globalpara.allSet.insert(node);
+                if(node->linked)
+                    addLinkedSet(node,"c");
+            }
+        }
+    }
+    if(type=="p")
+    {
+        QSet<Node*>pTempSet;
+        pTempSet.unite(PSet);
+        pTempSet.insert(this);
+        foreach(Node* node,pTempSet)
+        {
+            if(!globalpara.allSet.contains(node))
+            {
+                globalpara.allSet.insert(node);
+                if(node->linked)
+                    addLinkedSet(node,"p");
+            }
+        }
+    }
+    if(type=="w")
+    {
+        QSet<Node*>wTempSet;
+        wTempSet.unite(WSet);
+        wTempSet.insert(this);
+        foreach(Node* node,wTempSet)
+        {
+            if(!globalpara.allSet.contains(node))
+            {
+                globalpara.allSet.insert(node);
+                if(node->linked)
+                    addLinkedSet(node,"w");
+            }
+        }
+    }
+    if(type=="fluid")
+    {
+        QSet<Node*>fluidTempSet;
+        fluidTempSet.unite(FluidSet);
+        fluidTempSet.insert(this);
+        foreach(Node* node,fluidTempSet)
+        {
+            if(!globalpara.allSet.contains(node))
+            {
+                globalpara.allSet.insert(node);
+                if(node->linked)
+                    addLinkedSet(node,"fluid");
+            }
+        }
+    }
+    return false;
 }
 
 bool Node::addLinkedSet(Node *thisNode, QString type, bool searchCloseLoop, Node *startNode)
